@@ -721,8 +721,8 @@
     const groove=Math.max(0,Number(g.groove||0));
     return {
       outerW, outerH, frame, groove,
-      glassW:Math.max(0,outerW-frame*2+groove*2),
-      glassH:Math.max(0,outerH-frame*2+groove*2)
+      glassW:Math.max(0,outerW-frame*2),
+      glassH:Math.max(0,outerH-frame*2)
     };
   }
   function lineIntersection(a,b,c,d){
@@ -755,90 +755,89 @@
   function createGlassSvg(g){
     const metrics=getGlassMetrics(g);
     const outerW=metrics.outerW, outerH=metrics.outerH, frame=metrics.frame, groove=metrics.groove;
-    const safeFrame=Math.max(0,Math.min(frame,Math.min(outerW,outerH)/2-2));
-    const glassInset=Math.max(0,safeFrame-groove);
-    const safeGlassInset=Math.max(0,Math.min(glassInset,Math.min(outerW,outerH)/2-1));
-    const safeGroove=Math.max(0,Math.min(groove,Math.min(outerW,outerH)/2-safeFrame-2));
-    const frameStroke='#C89426', grooveStroke='#9CCED3', glassStroke='#6A7075', glassFill='#C7D0D4', outerFill='#FAFAF7';
+    const maxInset=Math.max(0,Math.min(outerW,outerH)/2-1);
+    const safeFrame=clamp(frame,0,maxInset);
+    const grooveOuterInset=clamp(safeFrame-groove,0,safeFrame);
+    const frameStroke='#C89426';
+    const glassStroke='#5E666B';
+    const glassFill='#C7D0D4';
+    const grooveFill='#A8D8DE';
+    const grooveStroke='#78B8C1';
+    const outerFill='#FAFAF7';
     const outerStrokeW=Math.max(2.2,Math.min(4.8,Math.min(outerW,outerH)/115));
-    const innerStrokeW=Math.max(1.2,outerStrokeW*.72);
+    const innerStrokeW=Math.max(1.1,outerStrokeW*.68);
 
-    function rectMarkup(x,y,w,h,rr,fill,stroke,sw){
-      return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rr}" ry="${rr}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+    function rectPath(inset){
+      const x=inset, y=inset;
+      const w=Math.max(2,outerW-inset*2), h=Math.max(2,outerH-inset*2);
+      return `M ${x} ${y} H ${x+w} V ${y+h} H ${x} Z`;
     }
     function sample4OuterPoints(inset){
       const leftH=Math.max(1,Number(g.leftHeight||1200));
       const rightH=Math.max(1,Number(g.rightHeight||800));
-      const bottom=outerH-inset;
-      const leftX=inset;
-      const rightX=outerW-inset;
-      const topLeft=bottom-leftH;
-      const topRight=bottom-rightH;
-      return [
-        {x:leftX,y:topLeft},
-        {x:rightX,y:topRight},
-        {x:rightX,y:bottom},
-        {x:leftX,y:bottom}
+      const base=[
+        {x:0,y:outerH-leftH},
+        {x:outerW,y:outerH-rightH},
+        {x:outerW,y:outerH},
+        {x:0,y:outerH}
       ];
+      return inset>0 ? offsetClockwisePolygon(base,inset) : base;
     }
-    function pathFromPoints(pts){ return `<path d="${pointsPath(pts)}"`; }
-    function buildGlassShape(inset, mode){
+    function samplePath(inset){
       const x=inset, y=inset;
       const w=Math.max(2,outerW-inset*2), h=Math.max(2,outerH-inset*2);
       const radiusBase=Math.max(0,Number(g.radius||80));
       const rr=clamp(radiusBase-inset,0,Math.min(w,h)/2);
-      const fill=mode==='groove' ? 'none' : glassFill;
-      const stroke=mode==='groove' ? grooveStroke : glassStroke;
-      const sw=mode==='groove' ? innerStrokeW : Math.max(1.0,innerStrokeW*.9);
-      if(g.sample===1){
-        return rectMarkup(x,y,w,h,0,fill,stroke,sw);
-      } else if(g.sample===2){
-        if(g.side==='right') return `<path d="M ${x} ${y} L ${x+w-rr} ${y} Q ${x+w} ${y} ${x+w} ${y+rr} L ${x+w} ${y+h} L ${x} ${y+h} Z" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
-        return `<path d="M ${x+rr} ${y} L ${x+w} ${y} L ${x+w} ${y+h} L ${x} ${y+h} L ${x} ${y+rr} Q ${x} ${y} ${x+rr} ${y} Z" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
-      } else if(g.sample===3){
+      if(Number(g.sample)===4) return pointsPath(sample4OuterPoints(inset));
+      if(g.sample===1) return rectPath(inset);
+      if(g.sample===2){
+        if(g.side==='right') return `M ${x} ${y} L ${x+w-rr} ${y} Q ${x+w} ${y} ${x+w} ${y+rr} L ${x+w} ${y+h} L ${x} ${y+h} Z`;
+        return `M ${x+rr} ${y} L ${x+w} ${y} L ${x+w} ${y+h} L ${x} ${y+h} L ${x} ${y+rr} Q ${x} ${y} ${x+rr} ${y} Z`;
+      }
+      if(g.sample===3){
         const arch=Math.min(w/2,h);
-        return `<path d="M ${x} ${y+h} L ${x} ${y+arch} A ${arch} ${arch} 0 0 1 ${x+w} ${y+arch} L ${x+w} ${y+h} Z" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
-      } else if(g.sample===4){
-        const pts=offsetClockwisePolygon(sample4OuterPoints(0), inset);
-        return `<path d="${pointsPath(pts)}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
-      } else if(g.sample===5){
-        if(g.side==='right') return `<path d="M ${x} ${y} L ${x+w-rr} ${y} Q ${x+w} ${y} ${x+w} ${y+rr} L ${x+w} ${y+h} L ${x+rr} ${y+h} Q ${x} ${y+h} ${x} ${y+h-rr} L ${x} ${y} Z" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
-        return `<path d="M ${x+rr} ${y} L ${x+w} ${y} L ${x+w} ${y+h-rr} Q ${x+w} ${y+h} ${x+w-rr} ${y+h} L ${x} ${y+h} L ${x} ${y+rr} Q ${x} ${y} ${x+rr} ${y} Z" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
-      } else if(g.sample===6){
+        return `M ${x} ${y+h} L ${x} ${y+arch} A ${arch} ${arch} 0 0 1 ${x+w} ${y+arch} L ${x+w} ${y+h} Z`;
+      }
+      if(g.sample===5){
+        if(g.side==='right') return `M ${x} ${y} L ${x+w-rr} ${y} Q ${x+w} ${y} ${x+w} ${y+rr} L ${x+w} ${y+h} L ${x+rr} ${y+h} Q ${x} ${y+h} ${x} ${y+h-rr} L ${x} ${y} Z`;
+        return `M ${x+rr} ${y} L ${x+w} ${y} L ${x+w} ${y+h-rr} Q ${x+w} ${y+h} ${x+w-rr} ${y+h} L ${x} ${y+h} L ${x} ${y+rr} Q ${x} ${y} ${x+rr} ${y} Z`;
+      }
+      if(g.sample===6){
         const tl=(g.side==='left'&&g.vertical==='top')?rr:0;
         const tr=(g.side==='right'&&g.vertical==='top')?rr:0;
         const br=(g.side==='right'&&g.vertical==='bottom')?rr:0;
         const bl=(g.side==='left'&&g.vertical==='bottom')?rr:0;
-        return `<path d="M ${x+tl} ${y} L ${x+w-tr} ${y} ${tr?`Q ${x+w} ${y} ${x+w} ${y+tr}`:`L ${x+w} ${y}`} L ${x+w} ${y+h-br} ${br?`Q ${x+w} ${y+h} ${x+w-br} ${y+h}`:`L ${x+w} ${y+h}`} L ${x+bl} ${y+h} ${bl?`Q ${x} ${y+h} ${x} ${y+h-bl}`:`L ${x} ${y+h}`} L ${x} ${y+tl} ${tl?`Q ${x} ${y} ${x+tl} ${y}`:''} Z" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
-      } else if(g.sample===7){
-        const pill=Math.min(w/2,h/2);
-        return rectMarkup(x,y,w,h,pill,fill,stroke,sw);
-      } else if(g.sample===8){
-        return rectMarkup(x,y,w,h,rr,fill,stroke,sw);
+        return `M ${x+tl} ${y} L ${x+w-tr} ${y} ${tr?`Q ${x+w} ${y} ${x+w} ${y+tr}`:`L ${x+w} ${y}`} L ${x+w} ${y+h-br} ${br?`Q ${x+w} ${y+h} ${x+w-br} ${y+h}`:`L ${x+w} ${y+h}`} L ${x+bl} ${y+h} ${bl?`Q ${x} ${y+h} ${x} ${y+h-bl}`:`L ${x} ${y+h}`} L ${x} ${y+tl} ${tl?`Q ${x} ${y} ${x+tl} ${y}`:''} Z`;
       }
-      return rectMarkup(x,y,w,h,0,fill,stroke,sw);
+      if(g.sample===7){
+        const pill=Math.min(w/2,h/2);
+        return `M ${x+pill} ${y} H ${x+w-pill} A ${pill} ${pill} 0 0 1 ${x+w} ${y+pill} V ${y+h-pill} A ${pill} ${pill} 0 0 1 ${x+w-pill} ${y+h} H ${x+pill} A ${pill} ${pill} 0 0 1 ${x} ${y+h-pill} V ${y+pill} A ${pill} ${pill} 0 0 1 ${x+pill} ${y} Z`;
+      }
+      if(g.sample===8){
+        return `M ${x+rr} ${y} H ${x+w-rr} Q ${x+w} ${y} ${x+w} ${y+rr} V ${y+h-rr} Q ${x+w} ${y+h} ${x+w-rr} ${y+h} H ${x+rr} Q ${x} ${y+h} ${x} ${y+h-rr} V ${y+rr} Q ${x} ${y} ${x+rr} ${y} Z`;
+      }
+      return rectPath(inset);
     }
 
-    let outer='';
+    let outerPath;
+    if(Number(g.sample)===4) outerPath=pointsPath(sample4OuterPoints(0));
+    else outerPath=rectPath(0);
+    const outer=`<path d="${outerPath}" fill="${outerFill}" stroke="${frameStroke}" stroke-width="${outerStrokeW}"/>`;
+
+    let grooveOuterPath, grooveInnerPath, glassPath;
     if(Number(g.sample)===4){
-      const pts=sample4OuterPoints(outerStrokeW/2);
-      outer=`<path d="${pointsPath(pts)}" fill="${outerFill}" stroke="${frameStroke}" stroke-width="${outerStrokeW}"/>`;
+      grooveOuterPath=samplePath(grooveOuterInset);
+      grooveInnerPath=samplePath(safeFrame);
+      glassPath=samplePath(safeFrame);
     } else {
-      outer=`<rect x="${outerStrokeW/2}" y="${outerStrokeW/2}" width="${Math.max(1,outerW-outerStrokeW)}" height="${Math.max(1,outerH-outerStrokeW)}" fill="${outerFill}" stroke="${frameStroke}" stroke-width="${outerStrokeW}"/>`;
+      // Khung và viền kính luôn vuông; chỉ phần kính mang biên dạng mẫu.
+      grooveOuterPath=rectPath(grooveOuterInset);
+      grooveInnerPath=rectPath(safeFrame);
+      glassPath=samplePath(safeFrame);
     }
-    let grooveShape='';
-    let glassShape='';
-    if(Number(g.sample)===4){
-      // Mẫu 4 giữ logic riêng: viền và kính offset theo chính biên dạng chéo.
-      grooveShape=buildGlassShape(safeFrame,'groove');
-      glassShape=buildGlassShape(safeFrame+safeGroove,'glass');
-    } else {
-      // Các mẫu còn lại: viền kính luôn vuông theo khung ngoài.
-      grooveShape=`<rect x="${safeFrame}" y="${safeFrame}" width="${Math.max(2,outerW-safeFrame*2)}" height="${Math.max(2,outerH-safeFrame*2)}" fill="none" stroke="${grooveStroke}" stroke-width="${innerStrokeW}"/>`;
-      // Hình kính mới mang biên dạng mẫu; theo công thức cũ, kính phủ ra phần viền kính.
-      glassShape=buildGlassShape(safeGlassInset,'glass');
-    }
-    return createSvgData(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${outerW} ${outerH}" preserveAspectRatio="xMidYMid meet">${outer}${grooveShape}${glassShape}</svg>`);
+    const grooveBand=`<path d="${grooveOuterPath} ${grooveInnerPath}" fill="${grooveFill}" fill-rule="evenodd" stroke="${grooveStroke}" stroke-width="${innerStrokeW}"/>`;
+    const glassShape=`<path d="${glassPath}" fill="${glassFill}" stroke="${glassStroke}" stroke-width="${innerStrokeW}"/>`;
+    return createSvgData(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${outerW} ${outerH}" preserveAspectRatio="xMidYMid meet">${outer}${grooveBand}${glassShape}</svg>`);
   }
   function buildPreviewCaption(type,g){
     const m=getGlassMetrics(g);
