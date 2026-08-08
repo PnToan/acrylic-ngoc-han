@@ -632,7 +632,7 @@
       const isSpecial=(r.type==='glass'||r.type==='altar');
       const req=isSpecial ? `<button class="preview-icon" data-preview-index="${i}" title="Xem kích thước">${specialIcon(r.type)}</button><span>${typeLabel(r.type)}</span>` : '';
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${i+1}</td><td class="left">CÁNH</td><td class="left">${escapeHtml(r.color)}</td><td>${fmt(r.width)}</td><td>${fmt(r.length)}</td><td>${escapeHtml(r.bevel||'')}</td><td>${fmt(area)}</td><td>${fmt(r.qty)}</td><td>${fmt(weight)}</td><td class="money">${fmtMoney(r.price||DEFAULT_PRICE)}</td><td class="money">${fmtMoney(amount)}</td><td>${req}<button class="row-delete" title="Xóa dòng" data-index="${i}">×</button></td>`;
+      tr.innerHTML=`<td>${i+1}</td><td class="left">${escapeHtml(r.name||'CÁNH')}</td><td class="left">${escapeHtml(r.color)}</td><td>${fmt(r.width)}</td><td>${fmt(r.length)}</td><td>${escapeHtml(r.bevel||'')}</td><td>${fmt(area)}</td><td>${fmt(r.qty)}</td><td>${fmt(weight)}</td><td class="money">${fmtMoney(r.price||DEFAULT_PRICE)}</td><td class="money">${fmtMoney(amount)}</td><td>${req}<button class="row-delete" title="Xóa dòng" data-index="${i}">×</button></td>`;
       body.appendChild(tr);
     });
     $('sumArea').textContent=fmt(sumArea); $('sumQty').textContent=fmt(sumQty); $('sumWeight').textContent=fmt(sumWeight); $('sumAmount').textContent=fmtMoney(sumAmount); $('paymentTotal').textContent=fmtMoney(sumAmount);
@@ -647,7 +647,7 @@
     if(!(length>0))return setStatus('Chiều dài phải lớn hơn 0.',true);
     if(!Number.isInteger(qty)||qty<1)return setStatus('Số lượng phải là số nguyên từ 1 trở lên.',true);
     if(!color||!meta)return setStatus('Vui lòng chọn Mã màu.',true);
-    rows.push({type:'normal',width,length,qty,color,bevel,price:meta.price,priceGroup:meta.priceGroup,colorGroup:meta.colorGroup,core:meta.core}); save(); render(); setStatus(`Đã thêm chi tiết số ${rows.length}.`);
+    rows.push({type:'normal',name:'CÁNH',width,length,qty,color,bevel,price:meta.price,priceGroup:meta.priceGroup,colorGroup:meta.colorGroup,core:meta.core}); save(); render(); setStatus(`Đã thêm chi tiết số ${rows.length}.`);
     $('width').value=''; $('length').value=''; $('qty').value='1'; $('bevel').value=''; $('width').focus();
   }
 
