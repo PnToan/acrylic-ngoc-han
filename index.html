@@ -640,6 +640,48 @@
     body.querySelectorAll('[data-preview-index]').forEach(btn=>btn.addEventListener('click',()=>openDimensionPreview(Number(btn.dataset.previewIndex))));
   }
 
+  function canonicalSpecial(type, data){
+    if(!data) return null;
+    const g=normalizeSpecial(type,data);
+    const out={width:Number(g.width),height:Number(g.height),frame:Number(g.frame),groove:Number(g.groove),sample:Number(g.sample)};
+    if(g.radius!==undefined) out.radius=Number(g.radius);
+    if(g.side!==undefined) out.side=String(g.side);
+    if(g.vertical!==undefined) out.vertical=String(g.vertical);
+    if(g.leftHeight!==undefined) out.leftHeight=Number(g.leftHeight);
+    if(g.rightHeight!==undefined) out.rightHeight=Number(g.rightHeight);
+    return out;
+  }
+  function rowSignature(r){
+    const type=r.type||'normal';
+    return JSON.stringify({
+      type,
+      name:String(r.name||'CÁNH'),
+      width:Number(r.width),
+      length:Number(r.length),
+      color:String(r.color||''),
+      bevel:String(r.bevel||''),
+      price:Number(r.price||DEFAULT_PRICE),
+      priceGroup:r.priceGroup==null?null:Number(r.priceGroup),
+      colorGroup:String(r.colorGroup||''),
+      core:String(r.core||''),
+      special:(type==='glass'||type==='altar')?canonicalSpecial(type,r.special||r.glass):null
+    });
+  }
+  function mergeOrAppendRow(candidate, excludeIndex=null){
+    const sig=rowSignature(candidate);
+    const found=rows.findIndex((r,i)=>i!==excludeIndex && rowSignature(r)===sig);
+    if(found>=0){
+      rows[found].qty=Number(rows[found].qty||0)+Number(candidate.qty||0);
+      return {merged:true,index:found};
+    }
+    if(excludeIndex!==null && rows[excludeIndex]){
+      rows[excludeIndex]=candidate;
+      return {merged:false,index:excludeIndex,updated:true};
+    }
+    rows.push(candidate);
+    return {merged:false,index:rows.length-1};
+  }
+
   function addRow(){
     const width=Number($('width').value),length=Number($('length').value),qty=Number($('qty').value),color=$('color').value,bevel=$('bevel').value;
     const meta=selectedProductMeta();
@@ -647,7 +689,9 @@
     if(!(length>0))return setStatus('Chiều dài phải lớn hơn 0.',true);
     if(!Number.isInteger(qty)||qty<1)return setStatus('Số lượng phải là số nguyên từ 1 trở lên.',true);
     if(!color||!meta)return setStatus('Vui lòng chọn Mã màu.',true);
-    rows.push({type:'normal',name:'CÁNH',width,length,qty,color,bevel,price:meta.price,priceGroup:meta.priceGroup,colorGroup:meta.colorGroup,core:meta.core}); save(); render(); setStatus(`Đã thêm chi tiết số ${rows.length}.`);
+    const result=mergeOrAppendRow({type:'normal',name:'CÁNH',width,length,qty,color,bevel,price:meta.price,priceGroup:meta.priceGroup,colorGroup:meta.colorGroup,core:meta.core});
+    save(); render();
+    setStatus(result.merged ? `Chi tiết trùng dữ liệu: đã cộng thêm ${qty} vào dòng ${result.index+1}. Tổng số lượng: ${rows[result.index].qty}.` : `Đã thêm chi tiết số ${rows.length}.`);
     $('width').value=''; $('length').value=''; $('qty').value='1'; $('bevel').value=''; $('width').focus();
   }
 
@@ -935,12 +979,27 @@
     const g=readSpecialForm();
     const err=validateSpecial(g); if(err) return alert(err);
     if(editingSpecialIndex!==null && rows[editingSpecialIndex]){
-      const realH=getEffectiveOuterHeight(g); const r=rows[editingSpecialIndex]; r.width=g.width; r.length=realH; r.special=g; delete r.glass; r.type=activeSpecialType; save(); render(); setStatus(`Đã cập nhật ${typeLabel(activeSpecialType)} dòng ${editingSpecialIndex+1}.`);
+      const oldQty=Number(rows[editingSpecialIndex].qty||1);
+      const oldRow=rows[editingSpecialIndex];
+      const realH=getEffectiveOuterHeight(g);
+      const candidate={...oldRow,type:activeSpecialType,name:oldRow.name||'CÁNH',width:g.width,length:realH,qty:oldQty,special:g};
+      delete candidate.glass;
+      const originalIndex=editingSpecialIndex;
+      const result=mergeOrAppendRow(candidate,originalIndex);
+      if(result.merged){
+        rows.splice(originalIndex,1);
+        const finalIndex=result.index>originalIndex ? result.index-1 : result.index;
+        save(); render(); setStatus(`Dữ liệu sau cập nhật trùng dòng ${finalIndex+1}: đã gộp số lượng.`);
+      } else {
+        save(); render(); setStatus(`Đã cập nhật ${typeLabel(activeSpecialType)} dòng ${result.index+1}.`);
+      }
     } else {
-      const qty=Number($('qty').value)||1; const color=$('color').value; const meta=selectedProductMeta();
+      const qtyRaw=Number($('qty').value)||1; const qty=Number.isInteger(qtyRaw)&&qtyRaw>0?qtyRaw:1; const color=$('color').value; const meta=selectedProductMeta();
       if(!color||!meta) return alert('Vui lòng chọn Mã màu và Loại cốt trước khi xác nhận.');
-      const realH=getEffectiveOuterHeight(g); rows.push({type:activeSpecialType,width:g.width,length:realH,qty:Number.isInteger(qty)&&qty>0?qty:1,color,bevel:'',price:meta.price,priceGroup:meta.priceGroup,colorGroup:meta.colorGroup,core:meta.core,special:g});
-      save(); render(); setStatus(`Đã thêm ${typeLabel(activeSpecialType)} số ${rows.length}.`);
+      const realH=getEffectiveOuterHeight(g);
+      const result=mergeOrAppendRow({type:activeSpecialType,name:'CÁNH',width:g.width,length:realH,qty,color,bevel:'',price:meta.price,priceGroup:meta.priceGroup,colorGroup:meta.colorGroup,core:meta.core,special:g});
+      save(); render();
+      setStatus(result.merged ? `${typeLabel(activeSpecialType)} trùng dữ liệu: đã cộng thêm ${qty} vào dòng ${result.index+1}. Tổng số lượng: ${rows[result.index].qty}.` : `Đã thêm ${typeLabel(activeSpecialType)} số ${rows.length}.`);
     }
     closeSpecialDialog();
   }
