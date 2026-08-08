@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đặt Hàng Cánh Acrylic</title>
+<style>
+  :root {
+    --gold:#D8B25E;
+    --gold-strong:#E2BF72;
+    --gold-soft:#F2E3B8;
+    --black:#070707;
+    --black-2:#101010;
+    --black-3:#181818;
+    --panel:#111111;
+    --line:#2A2A2A;
+    --line-gold:rgba(216,178,94,.42);
+    --white:#FFFFFF;
+    --paper:#FCFBF7;
+    --paper-2:#F6F1E4;
+    --text:#F5F1E6;
+    --muted:#9B9588;
+    --danger:#B8473F;
+  }
+  * { box-sizing:border-box; }
+  html { color-scheme:dark; }
+  body {
+    margin:0;
+    font-family:"Arial Narrow","Bahnschrift Condensed","Segoe UI",Arial,sans-serif;
+    background:
+      radial-gradient(circle at top right, rgba(216,178,94,.09), transparent 30%),
+      linear-gradient(180deg,#050505 0%,#0A0A0A 58%,#060606 100%);
+    color:var(--text);
+    min-height:100vh;
+    letter-spacing:.15px;
+  }
+  .app { max-width:1320px; margin:0 auto; padding:26px 18px 36px; }
+  .entry-panel {
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(145deg,#0A0A0A 0%,#111 58%,#0A0A0A 100%);
+    border:1px solid var(--line-gold);
+    border-radius:14px;
+    padding:22px 22px 20px;
+    box-shadow:0 18px 55px rgba(0,0,0,.42), inset 0 1px rgba(255,255,255,.02);
+    margin-bottom:18px;
+  }
+  .entry-panel::before {
+    content:"";
+    position:absolute; left:0; right:0; top:0; height:2px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  }
+  .brand-strip {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    padding-bottom:16px;
+    margin-bottom:18px;
+    border-bottom:1px solid rgba(216,178,94,.22);
+  }
+  .brand-lockup { display:flex; align-items:center; gap:14px; min-width:0; }
+  .brand-mark {
+    width:52px; height:52px; flex:0 0 52px;
+    display:grid; place-items:center;
+    border:2px solid var(--gold);
+    transform:rotate(45deg);
+    border-radius:8px;
+    box-shadow:inset 0 0 0 4px #0B0B0B, 0 0 22px rgba(216,178,94,.08);
+  }
+  .brand-mark span {
+    transform:rotate(-45deg);
+    color:var(--gold-strong);
+    font-family:"Arial Narrow","Bahnschrift Condensed",sans-serif;
+    font-weight:700;
+    font-size:20px;
+    letter-spacing:-1px;
+  }
+  .brand-text { min-width:0; }
+  .brand-name {
+    color:var(--gold-strong);
+    font-weight:300;
+    font-stretch:condensed;
+    font-size:30px;
+    line-height:1;
+    letter-spacing:2.8px;
+    white-space:nowrap;
+  }
+  .brand-tagline {
+    margin-top:5px;
+    color:#BFA86E;
+    font-size:10px;
+    letter-spacing:1.4px;
+    text-transform:uppercase;
+  }
+  .brand-section-actions { display:flex; align-items:center; gap:12px; }
+  .brand-section-title {
+    color:#E9E2D2;
+    font-size:13px;
+    letter-spacing:1.8px;
+    text-transform:uppercase;
+    text-align:right;
+  }
+  .theme-toggle {
+    display:inline-flex; align-items:center; gap:7px; padding:7px 10px;
+    color:var(--gold-strong); background:#111; border:1px solid #4A412F; border-radius:999px;
+    font-size:10px; letter-spacing:.7px; text-transform:uppercase;
+  }
+  .theme-toggle .track { width:28px; height:15px; border-radius:99px; background:#342E22; position:relative; display:inline-block; }
+  .theme-toggle .track::after { content:""; position:absolute; top:2px; left:2px; width:11px; height:11px; border-radius:50%; background:var(--gold); transition:left .18s; }
+  body.light-theme .theme-toggle .track::after { left:15px; }
+  body.light-theme { background:#EAE7DF; color:#29251E; }
+  body.light-theme .entry-panel { background:#FFFDF8; border-color:#C9B16E; box-shadow:0 12px 35px rgba(69,56,31,.12); }
+  body.light-theme .brand-name, body.light-theme .entry-panel h1 { color:#9C7628; }
+  body.light-theme .brand-tagline, body.light-theme .brand-section-title, body.light-theme label { color:#6C5A36; }
+  body.light-theme input, body.light-theme textarea, body.light-theme select { background:#FFFFFF; color:#241F17; border-color:#C9C0AF; }
+  body.light-theme select option { background:#FFF; color:#241F17; }
+  body.light-theme .btn-secondary, body.light-theme .theme-toggle { background:#F4EFE4; color:#72591F; border-color:#C8B47A; }
+  body.light-theme .btn-glass, body.light-theme .btn-altar { color:#8A681E; border-color:#B8923C; }
+  body.light-theme .note { color:#756F64; }
+  body.light-theme .sheet-wrap { background:#DAD4C7; border-color:#C6B275; box-shadow:none; }
+  body.light-theme .modal-backdrop { background:rgba(238,234,224,.78); }
+  body.light-theme .glass-dialog, body.light-theme .glass-settings, body.light-theme .glass-head { background:#FFFDF8; }
+  body.light-theme .glass-head h2 { color:#8B671B; }
+  body.light-theme .glass-settings { border-left-color:#D4C18C; }
+  body.light-theme .glass-preview-pane { background:#F3EFE5; }
+  body.light-theme .sample-card { background:#FFF; color:#5D5548; border-color:#C9C0AF; }
+  body.light-theme .sample-card.active { background:#F7EFD9; border-color:#B78D31; color:#735514; }
+  body.light-theme .preview-caption { color:#665E50; }
+  body.light-theme .preview-only-content, body.light-theme .dimension-preview { background:#F5F1E8; }
+  body.light-theme .dim-callout { background:#FFFDF8; color:#7A5B1B; }
+  .entry-panel h1 {
+    margin:0 0 14px;
+    color:var(--gold-strong);
+    font-size:19px;
+    font-weight:600;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+  }
+  .input-row { display:grid; grid-template-columns:repeat(4,minmax(150px,1fr)); gap:11px; align-items:end; }
+  .price-display { min-height:40px; display:flex; align-items:center; padding:9px 11px; border:1px solid #353535; border-radius:7px; background:#0B0B0B; color:var(--gold-strong); font-size:14px; font-weight:700; }
+  body.light-theme .price-display { background:#FFFFFF; color:#72591F; border-color:#C9C0AF; }
+  .confirm-cell { display:flex; align-items:end; }
+  label {
+    display:block;
+    color:#CDBD97;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.7px;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  input, textarea, select {
+    width:100%;
+    border:1px solid #353535;
+    border-radius:7px;
+    padding:10px 11px;
+    font-family:inherit;
+    font-size:14px;
+    color:#F6F1E7;
+    background:#0B0B0B;
+    transition:border-color .18s, box-shadow .18s, background .18s;
+  }
+  input::placeholder, textarea::placeholder { color:#68645D; }
+  input:hover, textarea:hover, select:hover { border-color:#545048; }
+  input:focus, textarea:focus, select:focus {
+    outline:none;
+    border-color:var(--gold);
+    background:#0D0D0D;
+    box-shadow:0 0 0 3px rgba(216,178,94,.10);
+  }
+  select option { background:#111; color:#EEE7D8; }
+  button {
+    border:1px solid transparent;
+    border-radius:7px;
+    padding:10px 15px;
+    font-family:inherit;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.8px;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:transform .15s, background .15s, border-color .15s, color .15s, box-shadow .15s;
+  }
+  button:hover { transform:translateY(-1px); }
+  button:active { transform:translateY(0); }
+  .btn-confirm {
+    min-width:112px;
+    color:#090909;
+    background:linear-gradient(180deg,#E6C77F,#CBA04D);
+    border-color:#E8CB88;
+    box-shadow:0 6px 18px rgba(216,178,94,.16);
+  }
+  .btn-confirm:hover { background:linear-gradient(180deg,#F0D28D,#D7AC58); }
+  .btn-secondary { background:#171717; color:#D9D2C4; border-color:#3A3833; }
+  .btn-secondary:hover { border-color:#75684C; color:var(--gold-soft); }
+  .btn-glass { background:transparent; color:var(--gold-strong); border-color:var(--gold); }
+  .btn-glass:hover { background:rgba(216,178,94,.08); }
+  .btn-danger { background:transparent; color:#D58B84; border-color:#713B37; }
+  .btn-danger:hover { background:rgba(184,71,63,.10); border-color:#A65C56; }
+  .actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:13px; }
+  .note { margin-top:10px; font-size:11px; color:#8A8478; letter-spacing:.25px; }
+  .status { min-height:18px; margin-top:8px; font-size:12px; font-weight:600; color:var(--gold-strong); }
+
+  .sheet-wrap {
+    overflow:auto;
+    background:#0B0B0B;
+    border:1px solid rgba(216,178,94,.27);
+    border-radius:14px;
+    padding:16px;
+    box-shadow:0 16px 46px rgba(0,0,0,.32);
+  }
+  .sheet {
+    width:1120px;
+    min-height:730px;
+    margin:auto;
+    color:#1A1814;
+    background:linear-gradient(180deg,#FFFDF8 0%,#FBF8F1 100%);
+    padding:20px 22px 28px;
+    border:1px solid #C9B98F;
+    box-shadow:0 10px 36px rgba(0,0,0,.28);
+  }
+  .title {
+    position:relative;
+    text-align:center;
+    color:#17130C;
+    font-size:22px;
+    font-weight:700;
+    letter-spacing:1.2px;
+    margin:0 0 20px;
+    padding:5px 0 12px;
+  }
+  .title::after {
+    content:"";
+    position:absolute; left:30%; right:30%; bottom:0; height:2px;
+    background:linear-gradient(90deg,transparent,#C29A4B,transparent);
+  }
+  .meta { width:100%; border-collapse:collapse; margin-bottom:13px; font-size:13px; }
+  .meta td { padding:5px 6px; vertical-align:middle; }
+  .meta .label, .meta .right-label { color:#4C412A; font-weight:700; }
+  .meta .label { width:125px; }
+  .meta .right-label { width:145px; }
+  .meta input {
+    color:#16130E;
+    background:transparent;
+    border:0;
+    border-bottom:1px dotted #8F7E58;
+    border-radius:0;
+    padding:4px 3px;
+    box-shadow:none;
+  }
+  .meta input:focus { border-bottom-color:#B98D37; background:#FFFDF8; box-shadow:none; }
+
+  .order-table { width:100%; border-collapse:collapse; table-layout:fixed; font-size:12px; }
+  .order-table th, .order-table td {
+    border:1px solid #5C533F;
+    padding:6px 4px;
+    text-align:center;
+    vertical-align:middle;
+  }
+  .order-table thead th {
+    background:#17130C;
+    color:#E6C77F;
+    border-color:#3B3427;
+    font-weight:700;
+    letter-spacing:.35px;
+  }
+  .order-table tbody tr:nth-child(even) td { background:#FAF5E9; }
+  .order-table tbody tr:hover td { background:#F3E7C8; }
+  .order-table .left { text-align:left; }
+  .order-table .money { text-align:right; padding-right:7px; font-variant-numeric:tabular-nums; }
+  .order-table .total-label { font-weight:800; text-align:center; color:#9B742E; }
+  .order-table tfoot td { font-weight:700; background:#F3E7C8; }
+  .col-stt{width:45px}.col-name{width:105px}.col-color{width:125px}.col-dim{width:70px}.col-area{width:78px}.col-qty{width:76px}.col-weight{width:92px}.col-price{width:98px}.col-total{width:110px}.col-note{width:122px}
+  .row-delete { cursor:pointer; color:#A74640; font-weight:800; border:0; background:none; padding:0 4px; font-size:18px; text-transform:none; }
+  .row-delete:hover { transform:none; color:#7D2621; }
+  .preview-icon {
+    display:inline-flex;
+    width:25px; height:25px;
+    align-items:center; justify-content:center;
+    padding:0; margin-right:5px;
+    border:1px solid #B68B38;
+    background:#17130C;
+    color:#E2BF72;
+    border-radius:4px;
+    vertical-align:middle;
+    text-transform:none;
+  }
+  .preview-icon:hover { transform:none; background:#2A2112; }
+  .preview-icon svg { width:16px; height:16px; }
+  .payment { width:100%; border-collapse:collapse; margin-top:0; font-size:13px; }
+  .payment td { border:1px solid #5C533F; padding:8px; }
+  .payment .label { width:72%; text-align:center; font-weight:800; background:#17130C; color:#E2BF72; }
+  .payment .value { text-align:right; font-weight:800; background:#F3E7C8; color:#5E4317; }
+  .signatures { display:grid; grid-template-columns:1fr 1fr 1fr; gap:35px; text-align:center; margin-top:28px; font-size:13px; }
+  .signatures .role { color:#4D4027; font-weight:700; }
+  .signatures .hint { margin-top:5px; color:#746A55; font-style:italic; }
+  .signatures .space { height:95px; }
+  .empty-state { color:#897F69; font-style:italic; }
+
+  .modal-backdrop {
+    position:fixed; inset:0;
+    background:rgba(0,0,0,.78);
+    backdrop-filter:blur(3px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:1000;
+    padding:20px;
+  }
+  .modal-backdrop.open { display:flex; }
+  .glass-dialog {
+    width:min(920px,96vw);
+    min-height:480px;
+    overflow:hidden;
+    background:#0C0C0C;
+    border:1px solid rgba(216,178,94,.55);
+    border-radius:14px;
+    box-shadow:0 28px 80px rgba(0,0,0,.58), 0 0 0 1px rgba(216,178,94,.06) inset;
+  }
+  .glass-head {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px;
+    border-bottom:1px solid rgba(216,178,94,.28);
+    background:#080808;
+  }
+  .glass-head h2 {
+    margin:0;
+    color:var(--gold-strong);
+    font-size:18px;
+    font-weight:600;
+    letter-spacing:1.3px;
+    text-transform:uppercase;
+  }
+  .glass-close {
+    width:34px; height:34px; padding:0;
+    color:#BCA96F;
+    background:#151515;
+    border:1px solid #3C372C;
+    font-size:22px;
+    line-height:1;
+    text-transform:none;
+  }
+  .glass-close:hover { color:#F2D48F; border-color:#6E5D34; }
+  .glass-content { display:grid; grid-template-columns:60% 40%; min-height:430px; }
+  .glass-preview-pane {
+    position:relative;
+    display:flex; align-items:center; justify-content:center;
+    padding:18px;
+    background:
+      radial-gradient(circle at center,rgba(216,178,94,.06),transparent 45%),
+      linear-gradient(145deg,#0A0A0A,#141414);
+  }
+  .glass-preview-pane::after {
+    content:"PREVIEW";
+    position:absolute; top:15px; left:16px;
+    color:#5E584C;
+    font-size:10px;
+    letter-spacing:2px;
+  }
+  .glass-settings { padding:20px; border-left:1px solid rgba(216,178,94,.26); background:#101010; }
+  .settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:13px; }
+  .settings-grid .full { grid-column:1/-1; }
+  .dynamic-fields { display:grid; grid-template-columns:1fr 1fr; gap:13px; margin-top:2px; }
+  .dynamic-fields .full { grid-column:1/-1; }
+  .field-hint { color:#8E8678; font-size:10px; line-height:1.35; margin-top:4px; }
+  .glass-settings .dialog-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:20px; }
+  .door-stage { width:88%; height:88%; display:flex; align-items:center; justify-content:center; }
+  .door {
+    position:relative;
+    width:250px; height:350px;
+    max-width:94%; max-height:90%;
+    background:transparent; border:0; box-shadow:none;
+  }
+
+  .door-stage { position:relative; }
+  .live-dims { position:absolute; inset:0; pointer-events:none; }
+  .live-dim { position:absolute; color:#E2BF72; font-size:10px; line-height:1; white-space:nowrap; }
+  .live-dim.h { border-top:1px solid #B99A58; height:18px; text-align:center; padding-top:4px; }
+  .live-dim.h::before,.live-dim.h::after { content:""; position:absolute; top:-5px; width:1px; height:10px; background:#B99A58; }
+  .live-dim.h::before{left:0}.live-dim.h::after{right:0}
+  .live-dim.v { border-left:1px solid #B99A58; width:18px; display:flex; align-items:center; justify-content:center; }
+  .live-dim.v::before,.live-dim.v::after { content:""; position:absolute; left:-5px; width:10px; height:1px; background:#B99A58; }
+  .live-dim.v::before{top:0}.live-dim.v::after{bottom:0}
+  .live-dim.v span { transform:rotate(-90deg); }
+  .live-callout { position:absolute; padding:5px 7px; border:1px solid #8A6A2C; border-radius:4px; background:rgba(17,17,17,.94); color:#E7C46F; font-size:10px; font-weight:600; white-space:nowrap; z-index:3; }
+  body.light-theme .live-callout { background:rgba(255,253,248,.97); color:#6E4D0C; border-color:#A47B29; }
+
+  .preview-caption {
+    position:absolute; left:14px; right:14px; bottom:12px;
+    text-align:center; color:#94896D; font-size:11px; letter-spacing:.4px;
+  }
+
+  .btn-altar { background:transparent; color:var(--gold-strong); border-color:var(--gold); }
+  .btn-altar:hover { background:rgba(216,178,94,.08); }
+  .sample-picker { margin-top:12px; }
+  .sample-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+  .sample-card {
+    position:relative; min-width:0; height:76px; padding:6px 5px 18px;
+    border:1px solid #34322D; border-radius:7px; background:#0B0B0B;
+    color:#9F9787; cursor:pointer; text-transform:none;
+  }
+  .sample-card:hover { border-color:#776642; transform:none; }
+  .sample-card.active { border-color:var(--gold); background:rgba(216,178,94,.08); color:var(--gold-soft); box-shadow:0 0 0 2px rgba(216,178,94,.08); }
+  .sample-card img { width:100%; height:46px; object-fit:contain; filter:none; pointer-events:none; }
+  .sample-card span { position:absolute; left:0; right:0; bottom:3px; font-size:9px; letter-spacing:.5px; text-align:center; pointer-events:none; }
+  .door.sample-source { display:flex; align-items:center; justify-content:center; overflow:visible; }
+  .door.sample-source::before,.door.sample-source::after { display:none !important; }
+  .source-shape { width:100%; height:100%; object-fit:contain; filter:none; opacity:1; }
+  .preview-only-dialog { max-width:760px; }
+  .preview-only-content { padding:20px; background:#0D0D0D; }
+  .dimension-preview {
+    min-height:470px; display:flex; align-items:center; justify-content:center; position:relative;
+    border:1px solid rgba(216,178,94,.20); border-radius:10px;
+    background:radial-gradient(circle at center,rgba(216,178,94,.06),transparent 58%),#090909;
+  }
+  .dim-stage { position:relative; width:480px; height:390px; display:flex; align-items:center; justify-content:center; }
+  .dim-door {
+    position:relative; border:0; background:transparent; box-shadow:none;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .dim-door::after { display:none; }
+  .dim-door img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; filter:none; }
+  .dim-line { position:absolute; color:#E6C77F; font-size:11px; letter-spacing:.2px; }
+  .dim-line.h { border-top:1px solid #B99A58; height:18px; text-align:center; }
+  .dim-line.h::before,.dim-line.h::after { content:""; position:absolute; top:-5px; width:1px; height:10px; background:#B99A58; }
+  .dim-line.h::before { left:0; }.dim-line.h::after { right:0; }
+  .dim-line.v { border-left:1px solid #B99A58; width:22px; display:flex; align-items:center; justify-content:center; }
+  .dim-line.v::before,.dim-line.v::after { content:""; position:absolute; left:-5px; width:10px; height:1px; background:#B99A58; }
+  .dim-line.v::before { top:0; }.dim-line.v::after { bottom:0; }
+  .dim-line.v span { transform:rotate(-90deg); white-space:nowrap; }
+  .dim-callout { position:absolute; padding:4px 6px; border:1px solid #5C4E31; border-radius:4px; background:#111; color:#E2BF72; font-size:10px; white-space:nowrap; }
+  .preview-source-note { position:absolute; right:12px; bottom:10px; color:#6E685D; font-size:9px; letter-spacing:.4px; }
+  @media(max-width:980px){
+    .input-row{grid-template-columns:1fr 1fr 1fr;}
+    .input-row .confirm-cell{grid-column:auto;}
+    .brand-section-title{display:none;}
+  }
+  @media(max-width:700px){
+    .glass-content{grid-template-columns:1fr;}
+    .glass-settings{border-left:0;border-top:1px solid rgba(216,178,94,.26);}
+    .input-row{grid-template-columns:1fr 1fr;}
+    .brand-name{font-size:24px;}
+    .brand-mark{width:44px;height:44px;flex-basis:44px;}
+  }
+  @media(max-width:480px){ .input-row{grid-template-columns:1fr;} }
+  @media print {
+    html { color-scheme:light; }
+    body { background:#fff; }
+    .app { max-width:none; margin:0; padding:0; }
+    .entry-panel,.modal-backdrop { display:none !important; }
+    .sheet-wrap { border:0; padding:0; overflow:visible; background:#fff; box-shadow:none; }
+    .sheet { width:100%; min-height:auto; padding:4mm; border:0; box-shadow:none; background:#fff; }
+    .row-delete,.preview-icon { display:none; }
+    .order-table thead th { color:#000; background:#eee; border-color:#222; }
+    .payment .label { color:#000; background:#eee; }
+    .payment .value, .order-table tfoot td { background:#fff; color:#000; }
+    @page { size:A4 landscape; margin:8mm; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <section class="entry-panel">
+    <div class="brand-strip">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true"><span>NH</span></div>
+        <div class="brand-text">
+          <div class="brand-name">NGỌC HÂN</div>
+          <div class="brand-tagline">Pioneering Creativity and Innovation</div>
+        </div>
+      </div>
+      <div class="brand-section-actions"><div class="brand-section-title">Hệ thống đặt hàng acrylic</div><button class="theme-toggle" id="themeToggle" type="button" title="Đổi chế độ sáng / tối"><span id="themeLabel">Tối</span><span class="track" aria-hidden="true"></span></button></div>
+    </div>
+    <h1>Đặt Hàng Cánh Acrylic</h1>
+    <div class="input-row">
+      <div><label for="width">Chiều rộng (mm)</label><input id="width" type="number" min="1" step="0.1" placeholder="Nhập chiều rộng"></div>
+      <div><label for="length">Chiều dài (mm)</label><input id="length" type="number" min="1" step="0.1" placeholder="Nhập chiều dài"></div>
+      <div><label for="qty">Số lượng</label><input id="qty" type="number" min="1" step="1" value="1" placeholder="Nhập số lượng"></div>
+      <div><label for="bevel">Cạnh Vát</label><select id="bevel"><option value="">Không vát</option><option value="Ngắn">Ngắn</option><option value="Dài">Dài</option></select></div>
+      <div><label for="color">Mã màu</label><select id="color"><option value="">Chọn mã màu</option></select></div>
+      <div><label for="coreType">Loại cốt</label><select id="coreType"><option value="wpc">Cốt Nhựa WPC</option><option value="mdf">Cốt Gỗ MDF</option></select></div>
+      <div><label>Đơn giá / m²</label><div class="price-display" id="selectedPrice">—</div></div>
+      <div class="confirm-cell"><button class="btn-confirm" id="confirmBtn">Xác nhận</button></div>
+    </div>
+    <div class="actions">
+      <button class="btn-glass" id="glassBtn">Cánh kính</button>
+      <button class="btn-altar" id="altarBtn">Ông Táo</button>
+      <button class="btn-secondary" id="printBtn">In phiếu</button>
+      <button class="btn-danger" id="clearBtn">Xóa toàn bộ chi tiết</button>
+    </div>
+    <div class="note">Kích thước trên phiếu: Rộng – Dài – Vát. Cạnh Vát “Ngắn / Dài” được ghi trực tiếp vào cột Vát.</div>
+    <div class="status" id="status"></div>
+  </section>
+
+  <div class="sheet-wrap">
+    <section class="sheet" id="orderSheet">
+      <div class="title">ĐƠN ĐẶT HÀNG CÁNH ACRYLIC NOLINE</div>
+      <table class="meta">
+        <tr><td class="label">Mã Khách:</td><td><input id="customerCode"></td><td></td><td class="right-label">Ngày đặt hàng</td><td><input id="orderDate" type="date"></td></tr>
+        <tr><td class="label">Tên khách hàng:</td><td><input id="customerName"></td><td></td><td class="right-label"></td><td></td></tr>
+        <tr><td class="label">Địa chỉ:</td><td><input id="address"></td><td></td><td class="right-label">Ngày dự kiến giao :</td><td><input id="deliveryDate" type="date"></td></tr>
+        <tr><td class="label">Mã NV Bán Hàng</td><td><input id="salesCode"></td><td></td><td class="right-label">Số</td><td><input id="orderNo" value="BH0000"></td></tr>
+        <tr><td class="label">Diễn giải:</td><td colspan="4"><input id="description"></td></tr>
+      </table>
+
+      <table class="order-table">
+        <thead>
+          <tr>
+            <th class="col-stt" rowspan="2">STT</th><th class="col-name" rowspan="2">Tên<br>sản phẩm</th><th class="col-color" rowspan="2">Mã màu</th>
+            <th colspan="3">Kích thước sản phẩm<br>(mm)</th><th class="col-area" rowspan="2">Số m2</th><th class="col-qty" rowspan="2">Số lượng<br>(cái)</th>
+            <th class="col-weight" rowspan="2">Tổng<br>khối lượng</th><th class="col-price" rowspan="2">Đơn giá</th><th class="col-total" rowspan="2">Thành tiền</th><th class="col-note" rowspan="2">Yêu cầu</th>
+          </tr>
+          <tr><th class="col-dim">Rộng</th><th class="col-dim">Dài</th><th class="col-dim">Vát</th></tr>
+        </thead>
+        <tbody id="orderBody"></tbody>
+        <tfoot><tr><td></td><td class="total-label">TỔNG</td><td></td><td></td><td></td><td></td><td id="sumArea">0</td><td id="sumQty">0</td><td id="sumWeight">0</td><td></td><td class="money" id="sumAmount">0</td><td></td></tr></tfoot>
+      </table>
+      <table class="payment"><tr><td class="label">Tổng tiền thanh toán:</td><td class="value" id="paymentTotal">0</td></tr></table>
+      <div class="signatures"><div><div class="role">Người nhận hàng</div><div class="hint">(Ký, họ tên)</div><div class="space"></div></div><div><div class="role">Thủ kho</div><div class="hint">(Ký, họ tên)</div><div class="space"></div></div><div><div class="role">Người lập phiếu</div><div class="hint">(Ký, họ tên)</div><div class="space"></div></div></div>
+    </section>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="glassModal" aria-hidden="true">
+  <div class="glass-dialog" role="dialog" aria-modal="true" aria-labelledby="glassTitle">
+    <div class="glass-head"><h2 id="glassTitle">Cánh kính</h2><button class="glass-close" id="glassClose" title="Đóng">×</button></div>
+    <div class="glass-content">
+      <div class="glass-preview-pane">
+        <div class="door-stage" id="doorStage"><div class="door sample-source" id="doorPreview"><img class="source-shape" id="doorSampleImage" alt=""></div><div class="live-dims" id="liveDims"></div></div>
+        <div class="preview-caption" id="previewCaption">Preview cánh kính</div>
+      </div>
+      <div class="glass-settings">
+        <div class="settings-grid">
+          <div><label for="glassWidth">Rộng (mm)</label><input id="glassWidth" type="number" min="1" step="0.1" value="600"></div>
+          <div><label for="glassHeight">Cao (mm)</label><input id="glassHeight" type="number" min="1" step="0.1" value="800"></div>
+          <div><label for="glassFrame">Rộng khung (mm)</label><input id="glassFrame" type="number" min="0" step="0.1" value="60"></div>
+          <div><label for="glassGroove">Viền kính (mm)</label><input id="glassGroove" type="number" min="0" step="0.1" value="10"></div>
+          <div class="full"><label>Mẫu Cánh</label><input id="glassSample" type="hidden" value="1"><div class="sample-grid" id="glassSampleGrid"></div></div>
+          <div class="full" id="glassDynamicFields"></div>
+        </div>
+        <div class="dialog-actions"><button class="btn-secondary" id="glassCancel">Hủy</button><button class="btn-confirm" id="glassConfirm">Xác nhận</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="previewModal" aria-hidden="true">
+  <div class="glass-dialog preview-only-dialog" role="dialog" aria-modal="true" aria-labelledby="previewOnlyTitle">
+    <div class="glass-head"><h2 id="previewOnlyTitle">Preview</h2><button class="glass-close" id="previewOnlyClose" title="Đóng">×</button></div>
+    <div class="preview-only-content">
+      <div class="dimension-preview">
+        <div class="dim-stage" id="dimStage"></div>
+        <div class="preview-source-note">Preview kích thước</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const STORAGE_KEY = 'acrylic_order_form_v3';
+  const LEGACY_KEYS = ['acrylic_order_form_v2'];
+  const DEFAULT_PRICE = 1310000;
+  const COLOR_PRICE_DATA = [{"code":"KR+21H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+25H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+26H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+27H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+28H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+32H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+33H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+35H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+36H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+37H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+38H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+50D","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+51H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+53H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+58T","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+59T","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+66H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+68H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+69D","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+70D","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+71D","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+72H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+73D","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+76H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+96H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+99H","priceGroup":1,"colorGroup":"Màu đơn sắc","wpc":1330000,"mdf":1130000},{"code":"KR+06T","priceGroup":2,"colorGroup":"Màu nhũ","wpc":1520000,"mdf":1310000},{"code":"KR+08T","priceGroup":2,"colorGroup":"Màu nhũ","wpc":1520000,"mdf":1310000},{"code":"KR+10H","priceGroup":2,"colorGroup":"Màu nhũ","wpc":1520000,"mdf":1310000},{"code":"KR+11T","priceGroup":2,"colorGroup":"Màu nhũ","wpc":1520000,"mdf":1310000},{"code":"KR+20T","priceGroup":2,"colorGroup":"Màu nhũ","wpc":1520000,"mdf":1310000},{"code":"KR+22H","priceGroup":2,"colorGroup":"Màu nhũ","wpc":1520000,"mdf":1310000},{"code":"KR+23T","priceGroup":2,"colorGroup":"Màu nhũ","wpc":1520000,"mdf":1310000},{"code":"KR+39H","priceGroup":2,"colorGroup":"Màu nhũ","wpc":1520000,"mdf":1310000},{"code":"KR+52T","priceGroup":2,"colorGroup":"Màu nhũ","wpc":1520000,"mdf":1310000},{"code":"KR+55T","priceGroup":2,"colorGroup":"Màu nhũ","wpc":1520000,"mdf":1310000},{"code":"KR+60T","priceGroup":2,"colorGroup":"Màu nhũ","wpc":1520000,"mdf":1310000},{"code":"KR+61T","priceGroup":2,"colorGroup":"Màu nhũ","wpc":1520000,"mdf":1310000},{"code":"KR+75H","priceGroup":2,"colorGroup":"Màu nhũ","wpc":1520000,"mdf":1310000},{"code":"KR+18T","priceGroup":3,"colorGroup":"Màu gỗ","wpc":1560000,"mdf":1360000},{"code":"KR+29T","priceGroup":3,"colorGroup":"Màu gỗ","wpc":1560000,"mdf":1360000},{"code":"KR+30H","priceGroup":3,"colorGroup":"Màu gỗ","wpc":1560000,"mdf":1360000},{"code":"KR+56H","priceGroup":3,"colorGroup":"Màu gỗ","wpc":1560000,"mdf":1360000},{"code":"KR+57H","priceGroup":3,"colorGroup":"Màu gỗ","wpc":1560000,"mdf":1360000},{"code":"KR+62D","priceGroup":3,"colorGroup":"Màu gỗ","wpc":1560000,"mdf":1360000},{"code":"KR+63T","priceGroup":3,"colorGroup":"Màu gỗ","wpc":1560000,"mdf":1360000},{"code":"KR+65T","priceGroup":3,"colorGroup":"Màu gỗ","wpc":1560000,"mdf":1360000},{"code":"KR+74T","priceGroup":3,"colorGroup":"Màu gỗ","wpc":1560000,"mdf":1360000}];
+  const SAMPLE_IMAGES = {
+    glass: ["data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAG4AAABQCAYAAAD4K0AmAAAFS0lEQVR42u2czU7bShiGX+cHSEwIcW3Ij4khKaAEFlW5AiSWuQEWcBO9im5ZwYY14iLYAuqmqioWUFr+lQaIS0qcXzJncYTlSc/igO0cjc73SBEeSEYj3nwz3/t5PABBEARBEARBEARBEARBEARBEARBEATBIYk24Pv7e9bpdNBoNMAYQ71eBwDc3t6i2+3CNE3U63VYlmX/rFar9t+enp649zLGsLKygo2NDYmE85jp6Wl2cXFht8PhMMLhMCKRCAKBAKLRKABAlmUEg0EoioJQKIREIsFdh0IhaJoGANA0DcFgEIlEAmtra7i6uhJKuJAIg4xGo+j1evY/ttVqodVq4fHx0ZP+0+k0E23mCdBqAUQiEeHGLETEDQ0N/av3lctl1ul04HyZpolut4uxsTEsLS3943Soqir29/fZxMSERMJ5iGEY2NvbY4qiSABQKpVYu93G2NgYAoEANE1DKBTC5uYmZFmGLMuIRqOQZRmapkGSJJyenqJUKrGFhQV8/PiRE0jXdfz69Ysizmvm5+dxd3dnt+v1Ora2tjA3N/fiCPnw4QM7Pz9nOzs7klO4nz9/0hrnNfl8Hs6scm5ujmu/hOXlZalQKODg4MBOSDKZDMrlMgnnNYVCAUdHR5yQp6enr+5vbW0Nu7u73FR5dnZGwnlNOp3Gt2/fuIhztl/K+Pg4vnz5wgl3eXlJwnnN27dvJWfEzczM4Pj4+NX9KYoiVSoVuz05OYmrqysSzg+ca5CiKPjx44er/nq9nn0di8VIuEEwNTUlVatVL6di6f7+noTzxbeEeOfittzV31+j0SDh/DLh1WrVTuHj8bir/nRdh2madn+BQICEG4QJTyaTuLi4YG6+CA8PD3Z7eHiYhBuECTcMw5Vpnp6ehjOzVFUV5XKZkXA+m3DDMFxZAk3TuEzSMAzUajWKOL9NeLFYdGXCc7kcJ1wqlRKqXimMcP0mPJ/PuypTTU5OcsJnMhmhvJxQqZRzTUun067qlfF4nOvPMAwSblAReHNz8+rPJ5NJyRmxqVRKqHqlUML1m2a3Nz8ty+KmToq4AZnwfiHdEI/HSbhBmfDx8XFUKhVPvFcymRSqXimUcP0mPJvNupoun/dYPiNSvVIo4fpNeKFQwMnJiavqyfX1tZD1SqGE6zfhbrcw6LrOVUtEqlcKJZyiKH/sPXFTPdF1HdfX13ZbVVUSzifhJKdpzmaznJAvJZfLcRFrGAYJ5xfdbte+npiYePU2vefPO013KpUi4fxiZGSES+Gd99ReM/U6vVsulyPh/ELXdc6EOyPwpUxNTUnn5+fOLwIJ5xfFYvEPE+6G29tbmir/CxOeyWTw/ft3T6on6XSahPOL2dlZLpPM5XJcSu+G0dFREs4vstks590Mw3BlwmVZ5pIdEm6AJtzNnXDDMDwrVJNwLzDh8/PzriLuzZs3nj1LPkiEOy4DABYXF9nXr18lADg7O2MrKytYX19HrVZDvV6HaZp4eHiAZVkwTRPNZhPPR2y022202200m030ej0Eg0EcHh7i/fv3dFyG37x79459/vzZHvvq6iorl8vQNM0+HkNVVfux4uffB4NBaJqGcDiMoaEhRKNRiPTct/CUSiXm3D7+fyQk4qCLxSJnnN1QqVRYq9VCp9OBZVlYXFwUIgKFnCa2t7fZzc0N8vm8fQRUrVZDtVqFZVn4/fs3ms0mGo0GJEnC09MTgL+fiYvFYhgZGUEsFoMsy9yUmkgksLq6SsL5yadPn9jo6CgikQjC4TCGh4ehqiqtVwRBEARBEARBEARBEARBEARBEARBEAQhFH8BMR9D6vKuDgAAAAAASUVORK5CYII=", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAG4AAABQCAYAAAD4K0AmAAAEe0lEQVR42u3asU/bWhQG8M+O08S4SrFxiGhBQm2lLAysHYGxMCAxw44Yqy4dWKi6dGiVqv9C14qtYgIkpCCVCQnRSqiCgACDLRCOnQT7vuE19znvwWulPpHQ9/2mXAeFq3N87nXuCUBERERERERERERERERERERERERERERERER0Gx0eHoqTkxPRSXNSbntAgyCAEAK+76NarcL3fbiui1qtBs/z5PXj42NEUQTXdeF5HqIoguM4aDQaaDQaCIIAURQhCAJ5LamnpweO4yhMXEKpVBLLy8twXRdxHMNxHMRxjDAM0Wg0UKvVrg1oOp1GOp2GruvQNA3ZbBZ37txBOp1GPp+HpmkwTROWZUHTNNi2DcMwYBgGTNNEJpOBZVkwDANdXV0wDAOKokDXdfT29sr4DA0Nic3NTSYuybZtMTc3B03TYFkWurq6kMvlfiqgN6XTEtcRhoaGOmL/OD4+FgcHB2JnZ0dsb2+3zGlkZKSj9jjttiX527dv4uLiQu5nnufh/Pwc1WpV7m2u68r3q9Uq4jhGEARQlD8LRggBXdehqqqsZsMwUCqV5NK5u7uL9+/fi9nZ2Y6ssluRuPX1dfHixQvYto3FxUX09fXJgBeLRaiqCl3Xkc1mm/vYLwd7ZWVFlMtlObYsCycnJ+K/+OzfJnH5fP7a98bHx0W5XMbS0pICAB8+fLiROZmmCd/35TiVSiGOY1Zc0uDgIPb398WDBw9a7ubR0VHx7t07DA4O3vhdrqoqXNdtqbgwDDsmcWqnVFzy7gaAp0+fipcvX7YlaQCg6zqiKOrYiuuIxPX39+Po6EiOK5WKqNfrePLkSdv2k3q9Dk37a0HSNI2Ju6riHMeR40+fPuHZs2dtndPa2hoGBgZa9rwgCJi4pEKhgEqlIscbGxsoFottndOrV68wMTHRsU/aHZO4vb29lmtnZ2dtm0+pVBK2baNYLCrXrQp8qgSQy+VagtLX19e2IH38+FHMzMzgy5cvKBQKrLh/MzAwoCSXStu2W5bOm1CpVMTU1JSYnp7G2toaCoVCy4ORZVktXw9Ycd8lK6y/vx9bW1u/9HmHh4ciedzleR7CMITneXAcB5eXl/A8D3t7e1hdXcXjx48xOTmJ3d1ddHd3/+NpNpVKtXw9YOK+S7Zr8vk8Xr9+jfn5eZHsozmOgyiK4Hme7J+FYQjf9yGEaHnqu3//PlRVlW2eTCYjX2ezWdl5ePToERYWFjA2NgbbtpXrTmZM08TOzg4Td9VJRVOxWMS9e/fw+fNn5HI5mKaJhw8fYnh4+Mq2z927d6HrOtLpNDKZjDyrjOMYFxcXP/zfb9++/eHfsOJ+wlVL1U07PT0VtVoNYRgiDEOUy+WWm4uJS2z+v7KPNfev5k8WHMeB7/vwfV8usc12T71ex+XlJYQQstqbFavrOizLwps3b2SLxzRNdHd3Y3Jykh3wv3v+/Ln4+vWrDGjz7FJRFNk/S6VSMrDJoDZfJ3+q0O6OOREREREREREREREREREREREREREREREREf0P/QFNcCKC4JrlKwAAAABJRU5ErkJggg==", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAG4AAABQCAYAAAD4K0AmAAADJ0lEQVR42u3bP0vzQBwH8O81UZsEBA+jk25VXESn4OYqDo4dHJwEJ/EFCBVRtIuO4ujm5iL4AhwKbr4BJwdpMAHRXGqT3DNZHn2UR+F5LGe/nylJ/3DNt/fr9ZIDiIiIiIiIiIiIiIiIiIiIiIioJ4he+aDNZlMXRYEkSVAUBZRSne25uTnB4P6zg4MDfXl5iTiOkWUZ4jhGmqYoigJpmiLLMiiloLWGUurVax3HgRACjuPAtm2Uy2U8PDyg0WhgYmLCqHNhmxbc/v4+Njc3Yds2fN+HZVmQUsLzPLiuC8dxUCqVUC6XYds2hoeHO4E8PT0BAB4fHzvvt7W1pdvttnEVxLjgPM/D+vp6z5T4j5RMa7DjOJ9+7v39vf6pwRnX41qt1oePXV1d6e3tbViWhcnJSdTrdSwsLGghBGq1GoIgEAyuS4qiePf46uqqvri4wPn5+bvhjI2N6ZWVFX1ycvIjwjOuVHqe98exxcVFvby8jFqt9mEox8fHYnZ2Fru7u5o9rguen59f7Z+enurb21vMz8//tSdtbGyIIAh0s9nUIyMjgsF9o7dD9729PVxfX386hJ2dHZydnbFUdntUKcTXOs74+DgajQaD+/YGl143eWho6Euv7+vrQ5IkDI4Y3Kf4vv9qPwxDBmeKOI41e5yBTJwU7vngpJT8gTMxOMuykKYpgzOx0R/NVzI4g0aVDM4gb29JYHAslQzOlFIZhuG7l4oY3H8QRRF7nImNzvOcwXFUyeC+zcv9kQzOMD/helrPBce5SkODK5VKHFVyVMngujaq/Oqf558y62Kb2OjfS6Xrujg8PNRCCMRxjCiK0Gq1EEURwjBEnueI4xhKKeR5jiAIsLS0xOC6Icuyzna1WsXR0VFnqdXg4CCklJiamsLMzAyklHBdt3NcSonp6WnB4LpcKtfW1npyyZXxpfKz7u7u9MvK1SRJOita6/U6bNu802Dct/Xm5kZXq1VUKhUopdBut6GU6gw6hBCwbRv9/f1wXRdSypeVqfA8D57nwfd9SCkxMDCA0dFRVCqVnl8oSURERERERERERERERERERERERP/SL/ZGHVRZiMNMAAAAAElFTkSuQmCC", "data:image/png;base64,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", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAG4AAABQCAYAAAD4K0AmAAAD70lEQVR42u3cP0/qbhQH8FOgIhSJVAthMEZJJDG6uThoHNQXYOLM7G7Cqm/AhNEX4Obi4OTo4OaAOrCog9GGx4Ah0vL/3MHQwFVvKPzyePu7309itEQa6dfn9JxSJQIAAAAAAAAAAAAAAAAAAAAAcEfx+gu4v7/nRqNBzWaTyuUytVotEkJQq9VytsvlMpVKpb7HXl9fne27uzsFwUm0vLzMDw8PpGkaqapKqqrS2NgYqapKuq6T3+8nwzAoEAhQLBajQCBAuq47X3c/7+7uKljDEiUSCf5XX7vPyz98o9EY6fn5fJ7Pz889GX7gX/otfXp64qOjIyoUCjQzM0P5fJ4uLy9RumSLRCIDrZZCocAbGxt8eHjIxWKx7zn7+/uMI/kXnuOy2Sxns9lvvy+TySA42ZLJ5LcHXQjB6+vrfH19/cdgdnZ2EJxMxWKR5+bmvjzoLy8vvLKy8qksfmVtbQ3ByWSaJqfTaf5uviuVSgMFsrS05MngPDsO1Go1UlX10+Obm5t8enpKuq4PNFRXq1VPvn7PjgOtVosMw+h77OTkhB8fHymdTg98JcSyLJQvmW5ubnhra6uvzC0sLLgue9FoFKVSpmq1SrFYzNk+Ozvjvb091/tpNpuE4CSyLIs0TXO2c7kcZTIZ1/sJhUIITiYhBIXD4d4RYOCGpHekCAaDCO6nmhPTNHlxcdH1Pur1el/4CE6CcrlMgcBHU/z29kapVGqo8yRKpWSlUol0XXcajGFWjm3blEwmEZxM7XbbCU4IQfF4fKjzZG9niuAkNSd+v//LDtNNuf19iEdwEsaB7kG3LGuoUimEQHA/Ocf1nu/cBjc1NYXgZKpWq84qq1QqFI1GseK8suK6rfwopXKYwBHciM1Jd44TQgw1j6E5+QGdTofGx8edsjnMpSshBE1OTiI4mWzbJp/P55TKr95UHWQfuOQlWa1Wo+npaaXbVcbjcde3kVuWRbjI/AOlsqtSqQy1j3q97oSP4CSOA70rZ9R9IDhJ/our+t2uFMFJ1G63/4rwEZxLw3SRvUzT5O444UWerRVuDrppmmxZFnU6HbJtm4QQdHFxQRMTEwQSmabJqVTKua0uGo3y7OwsJxIJjkQirGka+3y+Tx+RSIR1XedkMsnz8/Ocy+U8e/u5J1vh5+dn3t7eptvbW4WI6Orqiuv1OmmaRuFw2PnT4mAw6Nl2/39ZKmu1Wt8bp6urq8owq9ayLGo2m67ufEZwIwgGg/T+/k4HBwfc+58WbNumdrtNtm2ToijE/FEJNU0jRVEoFAqRYRikaRodHx+TYRieveTl6fPcIH9GBQAAAAAAAAAAAAAAAAAAAAAAH34B9HrCVdLBHpoAAAAASUVORK5CYII="],
+    altar: ["data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAG4AAABQCAYAAAD4K0AmAAAEw0lEQVR42u3Y30tTfRwH8Pf3NObm1OaPpW4im+mEdlPWXaUhdJNXlUiGqNBVDPwDqgshKehGgtNuRCho0EWE3RZ64Y2QXli5MlLR1k7MUqe2fq59ughHPnlsPjzBnud5v64G58OXL+d9Pt8fA4iIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiI/tdULk/uxo0botSPKSaTSSSTyc2TVwpnz55FXV2d0nVdRkdHAQAfP37E+/fv4XA4NtUODg5iz5496r8QnCVXJ9bb2yt+vx91dXU/JmqxwGKxQCmFjTCnpqZw5coVAEAoFMKzZ8/UxMSErK6uorOzE7du3YLNZsORI0dUMBiUhYUFdtyf1t7eLv39/Uin0xgcHMTjx4/x6NEjNDc3w+/348KFC+ru3bsyPT2NS5cuqf3798uxY8cQiURQVVWF/Pz8TPfZbDYYhoH+/n74fD523J80OzsLpRQOHjyIvr4+tLS0oKGhQXV0dEg0GkV7e7vMzc2htrYWhmFIdXU1Ghsb8fDhw1+CuXjxogwMDKCmpgZNTU2iadqm5yICq9UKq9UKEcksrbFYDLdv30YgEFCg7NTX10tbW5vcuXNHtnre3NwsHR0dMj4+LpFIRDRNk5cvX25Zq+u6AJB9+/YJAIyMjMi1a9dkZWVFwuGwnD59Wnp7eyUajcr9+/elp6dHACAYDMqTJ08kF9+PlqvBJRIJTE5O4syZM1t+7T6fD2NjY3C5XJibmwMA7N69e8ux5ufnUVhYiI1O6+rqgsPhwKFDhzA+Po6+vj4cOHAA586dw9DQEOLxOKLRqLx9+xYFBQXsoh1tvkpJKBQy/drD4bBomiaJREJ0XRdN00xrW1tbxe12SyAQkJ6eHunu7t62i0ZHR+XUqVNy9OhRWVxcZMdlyzAMAQCv17vtHqhpGpxOp5qfn88cRsw6zm63Iz8/H/fu3cPNmze33bMaGxvV9PQ04vF4zl4fcjK4eDwOpRR8Pp9pzczMDIqLizO/nU6nae3S0hJKS0tRXFy86W73O58+fcrZFSkng5udnQUAlJSUmNYsLCxknr9+/RplZWWmtWtra7DZbHA6nXC73VnPY9euXQzu7wRXXl5uukzFYrFMCIZhYO/evabjra+vw+l0wuFwoLKyMqs5lJSUIJ1OM7idiEQiKCoq2nYPXF5ezuyBHz58QEVFhWn9169fYbFYYLfbtw345/ELCgpQWFjIC/hOvHr1Cl1dXUilUr+c6CwWCwYGBnDy5MnMHri6ump6kDEMQzweD758+YK8vLysOm5tbQ0ulwvfvn3D1NQUg8vWu3fvcP369W1Pc7quS1lZGRYXF6W8vBy1tbVb1q2srAAA0uk0EolEVsElEgnk5eXB5XJxqfynPX/+HBUVFVheXoZSynQJ3Licp1IpDA8Pw+/3/3bs9fV1DA0NIRAIcKncic+fP+Pp06fy185JpVIAfvy3ePXqVXi93kwwpaWlpt2raRoePHigXrx4IfX19b+9lx0/fly9efNGKisrFYPbgRMnTuDy5cu/nPJ+Pp4fPnwYXq9XxWIxaWlpgcfj2fIlNzQ04Pz589B1HdmEtiGXQyMiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIvq3+g5lpstyL8cjmgAAAABJRU5ErkJggg==", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAG4AAABQCAYAAAD4K0AmAAABvUlEQVR42u3Yu8riUBSG4S8esDFRQSPYqAgWKnoDll6G92Fpr614EeZ21NrOU1QQD4iEPdX81YxhmiGG94FUezUrH2vB3hIAAAAAAAAAAAAAAAAAAAAAAAAAAN/HikMTnueZ2WymRCLxx3NjjCzLkjFGvu9ruVx+fd+pmAQnz/Pkuq61WCzMarX6OQuCQK/XS9Pp1JKkTqdj4tBzIg5NbLdbua5rDYdDM5lM1Ol0fr5er6cgCFSr1Ywk3e939mxUtNttMx6PTavV+us0DQYDMxwOTb1eN/yxiKhWq6ZSqYQG0mw2TaPRYFVGxe120+l0Cq3L5XJ6v98iuIi4Xq9yHOdjzel0Mvl8XtlsluCi4v1+K5PJfKx5vV5KJpOybZvgouBwOBhJoRP3eDzkOI5KpVIsgvv6e9zj8ZAkFYvFj3XP51OZTEapVIrgouD3vSxsko7Ho2zbVjqdZlVGge/76na7ocH5vi9JKhQKTFwU7Pd79ft9ua77se58PisIgtA6Ju4/2e122mw2KpfLoRO3Xq9jE5xiMHFmNBqFvoZcLhczn8957gIAAAAAAAAAAAAAAAAAAAAAAAAAAPhXvwCYJJSJQHwI7QAAAABJRU5ErkJggg==", "data:image/png;base64,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", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAG4AAABQCAYAAAD4K0AmAAADhUlEQVR42u3azUsqXQAG8GeO3wkZkkEUgRjUoqACI6xFiyJKKoIoglYFLaNFtI/+gXbRonWtw1WrCilx1SYrkL5EpNAMzDK1zl28vHG9t7ErV+/N7vNb6XDmMGeeOXPOzByAiIiIiIiIiIiIiIiIiIiIiIhURaNRybNQZgKBgGxoaPgywYl/JbiXlxc8Pz+DwRGDIwbH4IjBfRqvr68MruwaKgSenp4YXLkxmUy8VRKDIwaXX1VVFdxuNxMnIiIiIqJyp3zlxvl8PrmysgJFeb+ZiUQCQghIKVFbW4vNzU2Fl8QnMDExIW9vb39pnUlbW1tZrUfRlsuBjo+Py+Pj47f/ZrMZmUwGQghoNBpIKaHRaBCNRrG1tYXOzk7FarXC6/Wivb1dplIpjI6OYnd3F/F4HENDQ/D7/YhEIujq6kI4HC6ri7JsXnmdnJzA5XIhmUyivr4eBoMBoVAINzc3sFqtyGaziMViaGpqwuPj43+NEwKrq6vY3t6G1+uFy+XCxsYGzs7OlL6+Pqyvr+P8/FwBgIuLC7DHlUg0GsXi4iIqKyuRTqcxNzenBINB6fP50NLSgrGxsZyVXIqiwOl04ujoCMPDwznjl9vtVr4bC2G323F9fc3gik1KiVQqBYfDkXPSGxsb3343NzdLnU6Xs9/MzAympqZU693b25MHBwfY2dnhrbIUMpkMwuEwLBaLapnW1lYkEomcbSaTCUajUXWf/f19DA4Owmaz4VcnMgyuQMlkEj09PapT9rq6und7ajweV63TYrHg+0kPgysBu90Ov9+v2is8Hs9PPXJtbQ0DAwOqdc7PzytLS0uIxWIMrpS3S7WHaQAwGo2QMjfXWCyG3t7evPXabDb8ODYyuCJOTq6uruB0OlWTm5ycxOXlZc622dlZeDyevHXr9Xo4HI63xwgGV+TgNBpN3jLd3d24u7vL2ZZIJD5cTxmJRDjGlUo2my14iZ2UEsvLy1hYWMhbrr+//8NeyeB+52CFKDi409NTdHR05H15PD09jVAoxOD+lvfGqGw2++F+VqsVAJBOp/nmpOgHqtUiEAhACKH6ODAyMgK9Xg+z2VxQ3f+PnZlMhsEV2+HhIe7v76HX61XLVFRUQAiB6urqL/9drWyCq6mpKTgMnU4Hg8GAh4eHD3uzTqeDVqsFfRLBYFAWsxwREREREREREREREREREREREdEf9Q0XMzNq4JiG+wAAAABJRU5ErkJggg==", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAG4AAABQCAYAAAD4K0AmAAAEFElEQVR42u3a30tTbxwH8PdZQuesnWpjw7XEthWy4V3CmI70Kimim1EIYpCidJ1/gAwk9MJCCEEM+hd0CaZiiDeRQj8vwrza0FlrzS0GOtfmp4vAvqFujb7EtPcLdjHOc55z4H0+53mePQOIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiH6Lchhu8u7du/LmzZvd78eOHUOhUNjTTkSgKArm5+eVox5c1WG4yadPn2J5eVmJRqMyOTm5bxtVVdHd3a10dnZKLBaTs2fPHunwDIfhJkUE6+vrEgwGkU6nYTAY9nzC4TBGR0dF13Vsb2+DFVcBVFVFX18fHj58iKampgMrKZlMis/nQyaTObAvr9crbrf7xzihKBCRn+OGokBVVeRyOVy8eBGhUEhhxf0Bi8UCXddx6tSpou1qamqgaRoSiQSKhAuLxYKrV69ibGwMfr8fqqri+vXrGBkZgcvlQjwex7Nnz/iq/D+CMxqNRQMBAJvNBpPJVLTd169f0dbWhng8jhs3bqC2thYDAwN4//492tvb0draimAwiHg8zlfln7JardA0DclksmRwAIoGd+LECQwPD2Nubk4BgOfPn/9y/PLly2hpaZFv374xuHL19/fL+Pg4stksNE3DxMQE8vk8Tp48ifr6esnlcnA4HFhYWPhlDGpoaMCtW7dw//79A/vWdR07OztFr+9wOPDy5UsuFsvlcrkkEAhIVVWV1NTUiMvlkrq6OnE6naLrujgcDvF4PPLlyxcpt2+PxyMPHjwoet67d+/EYDAIK65MRqMRgUAAkUgEa2trv1RVMBgUTdOwvLyMzc3Nsvuurq7G69evS14fANLptJw+fVphKf2mS5cuyZUrV+TevXt7nvpPnz6JzWYTn88nKysrZVfFo0eP5MmTJyXP6+rqYsWV6/jx4wCAxsbGPcfsdrvS3NwsuVwO6XS67L57enp+q4IeP35c0ZVWkcsBs9kMEcHg4OC+xz98+ICtra2iC+2jriKDu3nzJmprazE7O7vvU//ixQvU19fj/PnzHFeI6C+oyAE4Go1KJpPZ3V8DgFQqhXw+D+DnvpvdbofX6/0np+sVOav0+/2wWq1YXV1Fb28vzpw5g0QigXPnzmFjYwOhUAhms3l3vcXJSQUtwDOZDMLhMBYXFzE2NoZoNIqhoSFMTU1henoawI/fJlOplIAqw4ULF+TOnTsSiUQODMXtdsvt27clFosJK65SBl5Fwdu3b+F0Og8cv6qrq5HNZv+J3e5DE1yhUIDJZCra5tq1axCRf3YRXpHBqapactPUaDQimUwilUoxuEphsVj2/fvdf3V0dGBpaalkwPQXzczMyMePH0tOOl69eiWfP3/mrJKIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiI6c77xOfGg5PZwNAAAAAElFTkSuQmCC"]
+  };
+  let rows = [];
+  let editingSpecialIndex = null;
+  let activeSpecialType = 'glass';
+
+  const $ = id => document.getElementById(id);
+  const fmt = n => new Intl.NumberFormat('vi-VN',{maximumFractionDigits:3}).format(Number(n||0));
+  const fmtMoney = n => new Intl.NumberFormat('vi-VN',{maximumFractionDigits:0}).format(Math.round(Number(n||0)));
+  const toISODate = d => { const x=new Date(d.getTime()-d.getTimezoneOffset()*60000); return x.toISOString().slice(0,10); };
+  const escapeHtml = v => String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+
+  function initDates(){ if(!$('orderDate').value){ const today=new Date(); $('orderDate').value=toISODate(today); const delivery=new Date(today); delivery.setDate(delivery.getDate()+4); $('deliveryDate').value=toISODate(delivery); } }
+  function collectMeta(){ return ['customerCode','customerName','address','salesCode','orderNo','description','orderDate','deliveryDate','color','coreType'].reduce((o,k)=>(o[k]=$(k).value,o),{}); }
+  function save(){ localStorage.setItem(STORAGE_KEY,JSON.stringify({rows,meta:collectMeta()})); }
+  function load(){
+    try{
+      let raw=localStorage.getItem(STORAGE_KEY);
+      if(!raw) for(const k of LEGACY_KEYS){ raw=localStorage.getItem(k); if(raw) break; }
+      const data=JSON.parse(raw||'{}');
+      rows=Array.isArray(data.rows)?data.rows:[];
+      if(data.meta)Object.keys(data.meta).forEach(k=>{if($(k))$(k).value=data.meta[k]??'';});
+    }catch(_e){ rows=[]; }
+    initDates();
+  }
+  function setStatus(text,error=false){ $('status').textContent=text; $('status').style.color=error?'#D58B84':'#E2BF72'; }
+  function typeLabel(type){ return type==='altar'?'Ông Táo':'Cánh kính'; }
+  function specialIcon(type){
+    if(type==='altar') return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16M6 19V9l3-4h6l3 4v10M9 9h6M8 13h8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="2.5" width="18" height="19" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="6.5" y="6" width="11" height="12.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 16L16 8" stroke="currentColor" stroke-width="1"/></svg>';
+  }
+
+  function getSelectedPriceRecord(){
+    const code=$('color').value;
+    return COLOR_PRICE_DATA.find(r=>r.code===code)||null;
+  }
+  function currentUnitPrice(){
+    const rec=getSelectedPriceRecord();
+    if(!rec) return null;
+    return $('coreType').value==='mdf' ? rec.mdf : rec.wpc;
+  }
+  function syncPriceSelectors(){
+    const current=$('color').value;
+    $('color').innerHTML='<option value="">Chọn mã màu</option>'+COLOR_PRICE_DATA.map(r=>`<option value="${r.code}">${r.code}</option>`).join('');
+    if(COLOR_PRICE_DATA.some(r=>r.code===current)) $('color').value=current;
+    updateSelectedPrice();
+  }
+  function updateSelectedPrice(){
+    const rec=getSelectedPriceRecord();
+    if(rec){
+      const price=currentUnitPrice(); $('selectedPrice').textContent=price?fmtMoney(price)+' đ':'—';
+    } else $('selectedPrice').textContent='—';
+  }
+  function selectedProductMeta(){
+    const rec=getSelectedPriceRecord();
+    return rec ? {priceGroup:rec.priceGroup,colorGroup:rec.colorGroup,core:$('coreType').value,price:currentUnitPrice()} : null;
+  }
+  function render(){
+    const body=$('orderBody'); body.innerHTML=''; let sumArea=0,sumQty=0,sumWeight=0,sumAmount=0;
+    if(!rows.length){ const tr=document.createElement('tr'); tr.innerHTML='<td colspan="12" class="empty-state">Chưa có chi tiết. Nhập thông tin phía trên và bấm Xác nhận.</td>'; body.appendChild(tr); }
+    else rows.forEach((r,i)=>{
+      const area=(Number(r.width)*Number(r.length))/1000000; const weight=area*Number(r.qty); const amount=weight*Number(r.price||DEFAULT_PRICE);
+      sumArea+=area; sumQty+=Number(r.qty); sumWeight+=weight; sumAmount+=amount;
+      const isSpecial=(r.type==='glass'||r.type==='altar');
+      const req=isSpecial ? `<button class="preview-icon" data-preview-index="${i}" title="Xem kích thước">${specialIcon(r.type)}</button><span>${typeLabel(r.type)}</span>` : '';
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${i+1}</td><td class="left">CÁNH</td><td class="left">${escapeHtml(r.color)}</td><td>${fmt(r.width)}</td><td>${fmt(r.length)}</td><td>${escapeHtml(r.bevel||'')}</td><td>${fmt(area)}</td><td>${fmt(r.qty)}</td><td>${fmt(weight)}</td><td class="money">${fmtMoney(r.price||DEFAULT_PRICE)}</td><td class="money">${fmtMoney(amount)}</td><td>${req}<button class="row-delete" title="Xóa dòng" data-index="${i}">×</button></td>`;
+      body.appendChild(tr);
+    });
+    $('sumArea').textContent=fmt(sumArea); $('sumQty').textContent=fmt(sumQty); $('sumWeight').textContent=fmt(sumWeight); $('sumAmount').textContent=fmtMoney(sumAmount); $('paymentTotal').textContent=fmtMoney(sumAmount);
+    body.querySelectorAll('.row-delete').forEach(btn=>btn.addEventListener('click',()=>{ rows.splice(Number(btn.dataset.index),1); save(); render(); setStatus('Đã xóa chi tiết.'); }));
+    body.querySelectorAll('[data-preview-index]').forEach(btn=>btn.addEventListener('click',()=>openDimensionPreview(Number(btn.dataset.previewIndex))));
+  }
+
+  function addRow(){
+    const width=Number($('width').value),length=Number($('length').value),qty=Number($('qty').value),color=$('color').value,bevel=$('bevel').value;
+    const meta=selectedProductMeta();
+    if(!(width>0))return setStatus('Chiều rộng phải lớn hơn 0.',true);
+    if(!(length>0))return setStatus('Chiều dài phải lớn hơn 0.',true);
+    if(!Number.isInteger(qty)||qty<1)return setStatus('Số lượng phải là số nguyên từ 1 trở lên.',true);
+    if(!color||!meta)return setStatus('Vui lòng chọn Mã màu.',true);
+    rows.push({type:'normal',width,length,qty,color,bevel,price:meta.price,priceGroup:meta.priceGroup,colorGroup:meta.colorGroup,core:meta.core}); save(); render(); setStatus(`Đã thêm chi tiết số ${rows.length}.`);
+    $('width').value=''; $('length').value=''; $('qty').value='1'; $('bevel').value=''; $('width').focus();
+  }
+
+  function createSvgData(svg){ return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg); }
+  function sampleCount(type){ return type==='glass' ? 8 : SAMPLE_IMAGES[type].length; }
+  function toNum(value,fallback){ const n=Number(value); return Number.isFinite(n) ? n : fallback; }
+  function clamp(value,min,max){ return Math.min(max,Math.max(min,value)); }
+  function normalizeSpecial(type,data={}){
+    const g={
+      width:toNum(data.width,600),
+      height:toNum(data.height,800),
+      frame:toNum(data.frame,60),
+      groove:toNum(data.groove,10),
+      sample:clamp(Math.round(toNum(data.sample,1)),1,sampleCount(type))
+    };
+    if(type==='glass'){
+      if([2,5,6,8].includes(g.sample)) g.radius=toNum(data.radius,80);
+      if([2,5].includes(g.sample)) g.side=(data.side==='right'?'right':'left');
+      if(g.sample===4){ g.leftHeight=toNum(data.leftHeight,1200); g.rightHeight=toNum(data.rightHeight,800); }
+      if(g.sample===6){ g.side=(data.side==='right'?'right':'left'); g.vertical=(data.vertical==='bottom'?'bottom':'top'); }
+    }
+    return g;
+  }
+  function getSpecialPreviewSrc(type,data){
+    const g=normalizeSpecial(type,data);
+    if(type==='glass') return createGlassSvg(g);
+    return SAMPLE_IMAGES[type][Math.max(0,Math.min(SAMPLE_IMAGES[type].length-1,Number(g.sample||1)-1))];
+  }
+  function getGlassExtraSummary(g){
+    if(g.sample===2) return `Bán kính ${fmt(g.radius)} · ${g.side==='right'?'Phải':'Trái'}`;
+    if(g.sample===4) return `Cao trái ${fmt(g.leftHeight)} · Cao phải ${fmt(g.rightHeight)}`;
+    if(g.sample===5) return `Bán kính ${fmt(g.radius)} · ${g.side==='right'?'Phải':'Trái'}`;
+    if(g.sample===6) return `Bán kính ${fmt(g.radius)} · ${g.side==='right'?'Phải':'Trái'} · ${g.vertical==='bottom'?'Dưới':'Trên'}`;
+    if(g.sample===8) return `Bán kính ${fmt(g.radius)}`;
+    return '';
+  }
+  function renderDynamicFields(type,data){
+    const host=$('glassDynamicFields');
+    if(!host) return;
+    const g=normalizeSpecial(type,data);
+    if(type!=='glass'){ host.innerHTML=''; return; }
+    let html='';
+    if(g.sample===2){
+      html=`<div class="dynamic-fields"><div><label for="glassRadius">Bán kính (mm)</label><input id="glassRadius" type="number" min="0" step="0.1" value="${fmt(g.radius)}"></div><div><label for="glassSide">Bên cong</label><select id="glassSide"><option value="left" ${g.side==='left'?'selected':''}>Trái</option><option value="right" ${g.side==='right'?'selected':''}>Phải</option></select></div><div class="full field-hint">Mẫu 2: chọn bán kính và hướng cong trái / phải.</div></div>`;
+    } else if(g.sample===4){
+      html=`<div class="dynamic-fields"><div><label for="glassLeftHeight">Cao trái (mm)</label><input id="glassLeftHeight" type="number" min="0" step="0.1" value="${fmt(g.leftHeight)}"></div><div><label for="glassRightHeight">Cao phải (mm)</label><input id="glassRightHeight" type="number" min="0" step="0.1" value="${fmt(g.rightHeight)}"></div><div class="full field-hint">Mẫu 4: nhập cao trái và cao phải để tạo mặt cắt nghiêng như hình mẫu.</div></div>`;
+    } else if(g.sample===5){
+      html=`<div class="dynamic-fields"><div><label for="glassRadius">Bán kính (mm)</label><input id="glassRadius" type="number" min="0" step="0.1" value="${fmt(g.radius)}"></div><div><label for="glassSide">Đầu bo</label><select id="glassSide"><option value="left" ${g.side==='left'?'selected':''}>Trái</option><option value="right" ${g.side==='right'?'selected':''}>Phải</option></select></div><div class="full field-hint">Mẫu 5: đầu bo ngang, chọn bán kính và phía trái / phải.</div></div>`;
+    } else if(g.sample===6){
+      html=`<div class="dynamic-fields"><div><label for="glassRadius">Bán kính (mm)</label><input id="glassRadius" type="number" min="0" step="0.1" value="${fmt(g.radius)}"></div><div><label for="glassSide">Bên bo</label><select id="glassSide"><option value="left" ${g.side==='left'?'selected':''}>Trái</option><option value="right" ${g.side==='right'?'selected':''}>Phải</option></select></div><div><label for="glassVertical">Vị trí bo</label><select id="glassVertical"><option value="top" ${g.vertical==='top'?'selected':''}>Trên</option><option value="bottom" ${g.vertical==='bottom'?'selected':''}>Dưới</option></select></div><div class="full field-hint">Mẫu 6: chọn bán kính và góc bo theo trái / phải / trên / dưới.</div></div>`;
+    } else if(g.sample===8){
+      html=`<div class="dynamic-fields"><div><label for="glassRadius">Bán kính (mm)</label><input id="glassRadius" type="number" min="0" step="0.1" value="${fmt(g.radius)}"></div><div class="full field-hint">Mẫu 8: bo tròn 4 góc theo bán kính.</div></div>`;
+    }
+    host.innerHTML=html;
+    host.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>applyPreview(readSpecialForm())));
+    host.querySelectorAll('select').forEach(el=>el.addEventListener('change',()=>applyPreview(readSpecialForm())));
+  }
+  function getEffectiveOuterHeight(g){
+    if(Number(g.sample)===4){
+      const frame=Math.max(0,Number(g.frame||0));
+      const groove=Math.max(0,Number(g.groove||0));
+      const glassInset=Math.max(0,frame-groove);
+      return Math.max(1, Number(g.leftHeight||0), Number(g.rightHeight||0));
+    }
+    return Math.max(1, Number(g.height||800));
+  }
+  function getGlassMetrics(g){
+    const outerW=Math.max(1,Number(g.width||600));
+    const outerH=getEffectiveOuterHeight(g);
+    const frame=Math.max(0,Number(g.frame||0));
+    const groove=Math.max(0,Number(g.groove||0));
+    return {
+      outerW, outerH, frame, groove,
+      glassW:Math.max(0,outerW-frame*2+groove*2),
+      glassH:Math.max(0,outerH-frame*2+groove*2)
+    };
+  }
+  function lineIntersection(a,b,c,d){
+    const den=(a.x-b.x)*(c.y-d.y)-(a.y-b.y)*(c.x-d.x);
+    if(Math.abs(den)<1e-6) return {x:c.x,y:c.y};
+    const x=((a.x*b.y-a.y*b.x)*(c.x-d.x)-(a.x-b.x)*(c.x*d.y-c.y*d.x))/den;
+    const y=((a.x*b.y-a.y*b.x)*(c.y-d.y)-(a.y-b.y)*(c.x*d.y-c.y*d.x))/den;
+    return {x,y};
+  }
+  function offsetClockwisePolygon(points,inset){
+    if(!(inset>0)) return points.map(p=>({x:p.x,y:p.y}));
+    const lines=[];
+    for(let i=0;i<points.length;i++){
+      const a=points[i], b=points[(i+1)%points.length];
+      const dx=b.x-a.x, dy=b.y-a.y, len=Math.hypot(dx,dy)||1;
+      const nx=-dy/len, ny=dx/len;
+      lines.push({a:{x:a.x+nx*inset,y:a.y+ny*inset}, b:{x:b.x+nx*inset,y:b.y+ny*inset}});
+    }
+    const out=[];
+    for(let i=0;i<lines.length;i++){
+      const prev=lines[(i-1+lines.length)%lines.length], curr=lines[i];
+      out.push(lineIntersection(prev.a,prev.b,curr.a,curr.b));
+    }
+    return out;
+  }
+  function pointsPath(points){
+    if(!points||!points.length) return '';
+    return 'M ' + points.map((p,i)=>`${i?'L ':' '}${p.x} ${p.y}`).join(' ') + ' Z';
+  }
+  function createGlassSvg(g){
+    const metrics=getGlassMetrics(g);
+    const outerW=metrics.outerW, outerH=metrics.outerH, frame=metrics.frame, groove=metrics.groove;
+    const safeFrame=Math.max(0,Math.min(frame,Math.min(outerW,outerH)/2-2));
+    const glassInset=Math.max(0,safeFrame-groove);
+    const safeGlassInset=Math.max(0,Math.min(glassInset,Math.min(outerW,outerH)/2-1));
+    const safeGroove=Math.max(0,Math.min(groove,Math.min(outerW,outerH)/2-safeFrame-2));
+    const frameStroke='#C89426', grooveStroke='#9CCED3', glassStroke='#6A7075', glassFill='#C7D0D4', outerFill='#FAFAF7';
+    const outerStrokeW=Math.max(2.2,Math.min(4.8,Math.min(outerW,outerH)/115));
+    const innerStrokeW=Math.max(1.2,outerStrokeW*.72);
+
+    function rectMarkup(x,y,w,h,rr,fill,stroke,sw){
+      return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rr}" ry="${rr}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+    }
+    function sample4OuterPoints(inset){
+      const leftH=Math.max(1,Number(g.leftHeight||1200));
+      const rightH=Math.max(1,Number(g.rightHeight||800));
+      const bottom=outerH-inset;
+      const leftX=inset;
+      const rightX=outerW-inset;
+      const topLeft=bottom-leftH;
+      const topRight=bottom-rightH;
+      return [
+        {x:leftX,y:topLeft},
+        {x:rightX,y:topRight},
+        {x:rightX,y:bottom},
+        {x:leftX,y:bottom}
+      ];
+    }
+    function pathFromPoints(pts){ return `<path d="${pointsPath(pts)}"`; }
+    function buildGlassShape(inset, mode){
+      const x=inset, y=inset;
+      const w=Math.max(2,outerW-inset*2), h=Math.max(2,outerH-inset*2);
+      const radiusBase=Math.max(0,Number(g.radius||80));
+      const rr=clamp(radiusBase-inset,0,Math.min(w,h)/2);
+      const fill=mode==='groove' ? 'none' : glassFill;
+      const stroke=mode==='groove' ? grooveStroke : glassStroke;
+      const sw=mode==='groove' ? innerStrokeW : Math.max(1.0,innerStrokeW*.9);
+      if(g.sample===1){
+        return rectMarkup(x,y,w,h,0,fill,stroke,sw);
+      } else if(g.sample===2){
+        if(g.side==='right') return `<path d="M ${x} ${y} L ${x+w-rr} ${y} Q ${x+w} ${y} ${x+w} ${y+rr} L ${x+w} ${y+h} L ${x} ${y+h} Z" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+        return `<path d="M ${x+rr} ${y} L ${x+w} ${y} L ${x+w} ${y+h} L ${x} ${y+h} L ${x} ${y+rr} Q ${x} ${y} ${x+rr} ${y} Z" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+      } else if(g.sample===3){
+        const arch=Math.min(w/2,h);
+        return `<path d="M ${x} ${y+h} L ${x} ${y+arch} A ${arch} ${arch} 0 0 1 ${x+w} ${y+arch} L ${x+w} ${y+h} Z" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+      } else if(g.sample===4){
+        const pts=offsetClockwisePolygon(sample4OuterPoints(0), inset);
+        return `<path d="${pointsPath(pts)}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+      } else if(g.sample===5){
+        if(g.side==='right') return `<path d="M ${x} ${y} L ${x+w-rr} ${y} Q ${x+w} ${y} ${x+w} ${y+rr} L ${x+w} ${y+h} L ${x+rr} ${y+h} Q ${x} ${y+h} ${x} ${y+h-rr} L ${x} ${y} Z" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+        return `<path d="M ${x+rr} ${y} L ${x+w} ${y} L ${x+w} ${y+h-rr} Q ${x+w} ${y+h} ${x+w-rr} ${y+h} L ${x} ${y+h} L ${x} ${y+rr} Q ${x} ${y} ${x+rr} ${y} Z" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+      } else if(g.sample===6){
+        const tl=(g.side==='left'&&g.vertical==='top')?rr:0;
+        const tr=(g.side==='right'&&g.vertical==='top')?rr:0;
+        const br=(g.side==='right'&&g.vertical==='bottom')?rr:0;
+        const bl=(g.side==='left'&&g.vertical==='bottom')?rr:0;
+        return `<path d="M ${x+tl} ${y} L ${x+w-tr} ${y} ${tr?`Q ${x+w} ${y} ${x+w} ${y+tr}`:`L ${x+w} ${y}`} L ${x+w} ${y+h-br} ${br?`Q ${x+w} ${y+h} ${x+w-br} ${y+h}`:`L ${x+w} ${y+h}`} L ${x+bl} ${y+h} ${bl?`Q ${x} ${y+h} ${x} ${y+h-bl}`:`L ${x} ${y+h}`} L ${x} ${y+tl} ${tl?`Q ${x} ${y} ${x+tl} ${y}`:''} Z" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+      } else if(g.sample===7){
+        const pill=Math.min(w/2,h/2);
+        return rectMarkup(x,y,w,h,pill,fill,stroke,sw);
+      } else if(g.sample===8){
+        return rectMarkup(x,y,w,h,rr,fill,stroke,sw);
+      }
+      return rectMarkup(x,y,w,h,0,fill,stroke,sw);
+    }
+
+    let outer='';
+    if(Number(g.sample)===4){
+      const pts=sample4OuterPoints(outerStrokeW/2);
+      outer=`<path d="${pointsPath(pts)}" fill="${outerFill}" stroke="${frameStroke}" stroke-width="${outerStrokeW}"/>`;
+    } else {
+      outer=`<rect x="${outerStrokeW/2}" y="${outerStrokeW/2}" width="${Math.max(1,outerW-outerStrokeW)}" height="${Math.max(1,outerH-outerStrokeW)}" fill="${outerFill}" stroke="${frameStroke}" stroke-width="${outerStrokeW}"/>`;
+    }
+    let grooveShape='';
+    let glassShape='';
+    if(Number(g.sample)===4){
+      // Mẫu 4 giữ logic riêng: viền và kính offset theo chính biên dạng chéo.
+      grooveShape=buildGlassShape(safeFrame,'groove');
+      glassShape=buildGlassShape(safeFrame+safeGroove,'glass');
+    } else {
+      // Các mẫu còn lại: viền kính luôn vuông theo khung ngoài.
+      grooveShape=`<rect x="${safeFrame}" y="${safeFrame}" width="${Math.max(2,outerW-safeFrame*2)}" height="${Math.max(2,outerH-safeFrame*2)}" fill="none" stroke="${grooveStroke}" stroke-width="${innerStrokeW}"/>`;
+      // Hình kính mới mang biên dạng mẫu; theo công thức cũ, kính phủ ra phần viền kính.
+      glassShape=buildGlassShape(safeGlassInset,'glass');
+    }
+    return createSvgData(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${outerW} ${outerH}" preserveAspectRatio="xMidYMid meet">${outer}${grooveShape}${glassShape}</svg>`);
+  }
+  function buildPreviewCaption(type,g){
+    const m=getGlassMetrics(g);
+    const parts=[`${fmt(m.outerW)} × ${fmt(m.outerH)} mm`,`Rộng khung ${fmt(g.frame)}`,`Viền kính ${fmt(g.groove)}`,`Mẫu ${g.sample}`];
+    if(type==='glass'){
+      const extra=getGlassExtraSummary(g);
+      if(extra) parts.push(extra);
+    }
+    return parts.join(' · ');
+  }
+  function getDefaultSpecial(type,sample=1){ return normalizeSpecial(type,{width:600,height:800,frame:60,groove:10,sample}); }
+  function renderSampleGrid(type,selected=1){
+    const grid=$('glassSampleGrid'); grid.innerHTML='';
+    const total=sampleCount(type);
+    for(let idx=1; idx<=total; idx++){
+      const g=type==='glass' ? getDefaultSpecial(type,idx) : normalizeSpecial(type,{sample:idx});
+      const src=getSpecialPreviewSrc(type,g);
+      const b=document.createElement('button'); b.type='button'; b.className='sample-card'+(idx===Number(selected)?' active':'');
+      b.dataset.sample=String(idx); b.innerHTML=`<img src="${src}" alt="Mẫu ${idx}"><span>Mẫu ${idx}</span>`;
+      b.addEventListener('click',()=>{
+        $('glassSample').value=String(idx);
+        const current=readSpecialForm();
+        current.sample=idx;
+        const next=normalizeSpecial(type,current);
+        renderSampleGrid(type,idx); renderDynamicFields(type,next); writeSpecialForm(next,true);
+      });
+      grid.appendChild(b);
+    }
+  }
+
+  function renderLiveDimensions(g){
+    const host=$('liveDims'); if(!host) return;
+    const door=$('doorPreview');
+    const m=getGlassMetrics(g);
+    const doorLeft=door.offsetLeft||0;
+    const doorTop=door.offsetTop||0;
+    const boxLeft=Math.max(10,doorLeft-132);
+    const boxTop=Math.max(44,doorTop+22);
+    host.innerHTML=`
+      <div class="live-callout" style="left:${boxLeft}px;top:${boxTop}px">Rộng khung: ${fmt(g.frame)} mm</div>
+      <div class="live-callout" style="left:${boxLeft}px;top:${boxTop+34}px">Viền kính: ${fmt(g.groove)} mm</div>
+      <div class="live-callout" style="left:${boxLeft}px;top:${boxTop+68}px">Kính: ${fmt(m.glassW)} × ${fmt(m.glassH)} mm</div>`;
+  }
+  function applyPreview(data){
+    const door=$('doorPreview');
+    const g=normalizeSpecial(activeSpecialType,data);
+    const m=getGlassMetrics(g);
+    const maxW=330,maxH=350,scale=Math.min(maxW/m.outerW,maxH/m.outerH);
+    door.style.width=Math.max(70,m.outerW*scale)+'px';
+    door.style.height=Math.max(90,m.outerH*scale)+'px';
+    $('doorSampleImage').src=getSpecialPreviewSrc(activeSpecialType,g);
+    renderLiveDimensions(g);
+    $('previewCaption').textContent=buildPreviewCaption(activeSpecialType,g);
+  }
+
+  function readSpecialForm(){
+    const base={ width:Number($('glassWidth').value), height:Number($('glassHeight').value), frame:Number($('glassFrame').value), groove:Number($('glassGroove').value), sample:Number($('glassSample').value) };
+    if(activeSpecialType==='glass'){
+      if($('glassRadius')) base.radius=Number($('glassRadius').value);
+      if($('glassSide')) base.side=$('glassSide').value;
+      if($('glassLeftHeight')) base.leftHeight=Number($('glassLeftHeight').value);
+      if($('glassRightHeight')) base.rightHeight=Number($('glassRightHeight').value);
+      if($('glassVertical')) base.vertical=$('glassVertical').value;
+    }
+    return normalizeSpecial(activeSpecialType,base);
+  }
+  function writeSpecialForm(g,skipDynamic=false){
+    const data=normalizeSpecial(activeSpecialType,g);
+    $('glassWidth').value=data.width??600; $('glassHeight').value=data.height??800; $('glassFrame').value=data.frame??60; $('glassGroove').value=data.groove??10; $('glassSample').value=String(data.sample??1);
+    renderSampleGrid(activeSpecialType,data.sample??1);
+    if(!skipDynamic) renderDynamicFields(activeSpecialType,data);
+    applyPreview(data);
+  }
+
+  function openSpecialDialog(type,index=null){
+    activeSpecialType=type; editingSpecialIndex=index;
+    const label=typeLabel(type); $('glassTitle').textContent=index===null?label:`Chỉnh ${label}`; $('glassConfirm').textContent=index===null?'Xác nhận':'Cập nhật';
+    const existing=index!==null && rows[index] ? (rows[index].special||rows[index].glass) : null;
+    const defaults=existing || getDefaultSpecial(type,1);
+    writeSpecialForm(defaults);
+    $('glassModal').classList.add('open'); $('glassModal').setAttribute('aria-hidden','false');
+  }
+  function closeSpecialDialog(){ $('glassModal').classList.remove('open'); $('glassModal').setAttribute('aria-hidden','true'); editingSpecialIndex=null; }
+
+  function validateSpecial(g){
+    if(!(g.width>0)) return 'Rộng phải lớn hơn 0.';
+    if(!(g.height>0)) return 'Cao phải lớn hơn 0.';
+    if(g.frame<0||g.groove<0) return 'Rộng khung và Viền kính không được âm.';
+    if(g.radius!==undefined && g.radius<0) return 'Bán kính không được âm.';
+    if(g.leftHeight!==undefined && g.leftHeight<0) return 'Cao trái không được âm.';
+    if(g.rightHeight!==undefined && g.rightHeight<0) return 'Cao phải không được âm.';
+    return '';
+  }
+  function confirmSpecial(){
+    const g=readSpecialForm();
+    const err=validateSpecial(g); if(err) return alert(err);
+    if(editingSpecialIndex!==null && rows[editingSpecialIndex]){
+      const realH=getEffectiveOuterHeight(g); const r=rows[editingSpecialIndex]; r.width=g.width; r.length=realH; r.special=g; delete r.glass; r.type=activeSpecialType; save(); render(); setStatus(`Đã cập nhật ${typeLabel(activeSpecialType)} dòng ${editingSpecialIndex+1}.`);
+    } else {
+      const qty=Number($('qty').value)||1; const color=$('color').value; const meta=selectedProductMeta();
+      if(!color||!meta) return alert('Vui lòng chọn Mã màu và Loại cốt trước khi xác nhận.');
+      const realH=getEffectiveOuterHeight(g); rows.push({type:activeSpecialType,width:g.width,length:realH,qty:Number.isInteger(qty)&&qty>0?qty:1,color,bevel:'',price:meta.price,priceGroup:meta.priceGroup,colorGroup:meta.colorGroup,core:meta.core,special:g});
+      save(); render(); setStatus(`Đã thêm ${typeLabel(activeSpecialType)} số ${rows.length}.`);
+    }
+    closeSpecialDialog();
+  }
+
+  function openDimensionPreview(index){
+    const r=rows[index]; if(!r)return;
+    const type=r.type==='altar'?'altar':'glass';
+    const g=normalizeSpecial(type,r.special||r.glass||{width:r.width,height:r.length,frame:0,groove:0,sample:1});
+    const m=getGlassMetrics(g);
+    const w=m.outerW, h=m.outerH;
+    const maxW=300,maxH=300,scale=Math.min(maxW/w,maxH/h); const dw=Math.max(100,w*scale), dh=Math.max(125,h*scale);
+    const glassW=m.glassW;
+    const glassH=m.glassH;
+    $('previewOnlyTitle').textContent=`${typeLabel(type)} · Mẫu ${g.sample||1}`;
+    $('dimStage').innerHTML=`
+      <div class="dim-callout" style="left:10px;top:12px">Rộng khung: ${fmt(g.frame)} mm</div>
+      <div class="dim-callout" style="left:10px;top:48px">Viền kính: ${fmt(g.groove)} mm</div>
+      <div class="dim-callout" style="left:10px;top:84px">Kính: ${fmt(glassW)} × ${fmt(glassH)} mm</div>
+      <div class="dim-door" style="width:${dw}px;height:${dh}px">
+        <img src="${getSpecialPreviewSrc(type,g)}" alt="">
+      </div>`;
+    $('previewModal').classList.add('open'); $('previewModal').setAttribute('aria-hidden','false');
+  }
+  function closeDimensionPreview(){ $('previewModal').classList.remove('open'); $('previewModal').setAttribute('aria-hidden','true'); }
+
+
+  function applyTheme(theme){
+    const light=theme==='light';
+    document.body.classList.toggle('light-theme',light);
+    $('themeLabel').textContent=light?'Sáng':'Tối';
+    localStorage.setItem('acrylic_theme',light?'light':'dark');
+  }
+  function initTheme(){
+    const saved=localStorage.getItem('acrylic_theme')||'dark';
+    applyTheme(saved);
+  }
+
+  $('color').addEventListener('change',()=>{updateSelectedPrice();save();});
+  $('coreType').addEventListener('change',()=>{updateSelectedPrice();save();});
+  $('confirmBtn').addEventListener('click',addRow);
+  ['width','length','qty'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addRow();}}));
+  $('glassBtn').addEventListener('click',()=>openSpecialDialog('glass'));
+  $('altarBtn').addEventListener('click',()=>openSpecialDialog('altar'));
+  $('glassClose').addEventListener('click',closeSpecialDialog); $('glassCancel').addEventListener('click',closeSpecialDialog); $('glassConfirm').addEventListener('click',confirmSpecial);
+  ['glassWidth','glassHeight','glassFrame','glassGroove'].forEach(id=>$(id).addEventListener('input',()=>applyPreview(readSpecialForm())));
+  $('glassModal').addEventListener('click',e=>{if(e.target===$('glassModal'))closeSpecialDialog();});
+  $('previewOnlyClose').addEventListener('click',closeDimensionPreview);
+  $('previewModal').addEventListener('click',e=>{if(e.target===$('previewModal'))closeDimensionPreview();});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('previewModal').classList.contains('open'))closeDimensionPreview();else if($('glassModal').classList.contains('open'))closeSpecialDialog();}});
+  $('themeToggle').addEventListener('click',()=>applyTheme(document.body.classList.contains('light-theme')?'dark':'light'));
+  $('printBtn').addEventListener('click',()=>window.print());
+  $('clearBtn').addEventListener('click',()=>{if(confirm('Xóa toàn bộ chi tiết trong đơn hàng?')){rows=[];save();render();setStatus('Đã xóa toàn bộ chi tiết.');}});
+  ['customerCode','customerName','address','salesCode','orderNo','description','orderDate','deliveryDate'].forEach(id=>$(id).addEventListener('input',save));
+  $('orderDate').addEventListener('change',()=>{if($('orderDate').value){const d=new Date($('orderDate').value+'T00:00:00');d.setDate(d.getDate()+4);$('deliveryDate').value=toISODate(d);save();}});
+
+  load(); syncPriceSelectors(); updateSelectedPrice(); initTheme(); render();
+})();
+</script>
+</body>
+</html>
