@@ -681,6 +681,7 @@
       if(!raw) for(const k of LEGACY_KEYS){ raw=localStorage.getItem(k); if(raw) break; }
       const data=JSON.parse(raw||'{}');
       rows=Array.isArray(data.rows)?data.rows:[];
+      normalizeAllRows();
       if(data.meta)Object.keys(data.meta).forEach(k=>{if($(k))$(k).value=data.meta[k]??'';});
     }catch(_e){ rows=[]; }
     initDates();
@@ -777,16 +778,58 @@
     const rec=getSelectedPriceRecord();
     return rec ? {priceGroup:rec.priceGroup,colorGroup:rec.colorGroup,core:$('coreType').value,price:currentUnitPrice()} : null;
   }
+
+  // Chuẩn hóa một lần cho cả dữ liệu nhập tay và dữ liệu đẩy từ SketchUp.
+  function normalizeCore(value){
+    const raw=String(value??'').trim().toLowerCase();
+    if(raw==='mdf'||raw.includes('gỗ mdf')||raw.includes('go mdf')) return 'mdf';
+    return 'wpc';
+  }
+  function priceRecordForCode(code){
+    const key=String(code??'').trim();
+    return COLOR_PRICE_DATA.find(r=>r.code===key)||null;
+  }
+  function normalizeOrderRow(input){
+    const row={...(input||{})};
+    row.name=String(row.name||'CÁNH');
+    row.width=Number(row.width||0);
+    row.length=Number(row.length||0);
+    row.qty=Math.max(1,Number(row.qty||1));
+    row.color=String(row.color||row.color_code||'').trim();
+    row.bevel=String(row.bevel||'');
+    row.core=normalizeCore(row.core||row.core_type||row.coreName||row.core_name);
+
+    const rec=priceRecordForCode(row.color);
+    if(rec){
+      row.priceGroup=rec.priceGroup;
+      row.colorGroup=rec.colorGroup;
+      row.price=Number(row.core==='mdf'?rec.mdf:rec.wpc);
+    }else{
+      const fallback=Number(row.price);
+      row.price=Number.isFinite(fallback)&&fallback>0?fallback:DEFAULT_PRICE;
+    }
+
+    const glass=row.glassInfo||row.glass_info||null;
+    if(glass&&typeof glass==='object'){
+      row.type='glass';
+      row.glassInfo=glass;
+    }
+    return row;
+  }
+  function normalizeAllRows(){
+    rows=Array.isArray(rows)?rows.map(normalizeOrderRow):[];
+  }
   function render(){
     const body=$('orderBody'); body.innerHTML=''; let sumArea=0,sumQty=0,sumWeight=0,sumAmount=0;
     if(!rows.length){ const tr=document.createElement('tr'); tr.innerHTML='<td colspan="12" class="empty-state">Chưa có chi tiết. Nhập thông tin phía trên và bấm Xác nhận.</td>'; body.appendChild(tr); }
-    else rows.forEach((r,i)=>{
-      const area=(Number(r.width)*Number(r.length))/1000000; const weight=area*Number(r.qty); const amount=weight*Number(r.price||DEFAULT_PRICE);
+    else rows.forEach((raw,i)=>{
+      const r=normalizeOrderRow(raw); rows[i]=r;
+      const area=(Number(r.width)*Number(r.length))/1000000; const weight=area*Number(r.qty); const amount=weight*Number(r.price);
       sumArea+=area; sumQty+=Number(r.qty); sumWeight+=weight; sumAmount+=amount;
       const isSpecial=(r.type==='glass'||r.type==='altar');
       const req=isSpecial ? `<button class="preview-icon" data-preview-index="${i}" title="Xem kích thước">${specialIcon(r.type)}</button><span>${typeLabel(r.type)}</span>` : '';
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${i+1}</td><td class="left">${escapeHtml(r.name||'CÁNH')}</td><td class="left">${escapeHtml(r.color)}</td><td>${fmt(r.width)}</td><td>${fmt(r.length)}</td><td>${escapeHtml(r.bevel||'')}</td><td>${fmt(area)}</td><td>${fmt(r.qty)}</td><td>${fmt(weight)}</td><td class="money">${fmtMoney(r.price||DEFAULT_PRICE)}</td><td class="money">${fmtMoney(amount)}</td><td>${req}<button class="row-delete" title="Xóa dòng" data-index="${i}">×</button></td>`;
+      tr.innerHTML=`<td>${i+1}</td><td class="left">${escapeHtml(r.name||'CÁNH')}</td><td class="left">${escapeHtml(r.color)}</td><td>${fmt(r.width)}</td><td>${fmt(r.length)}</td><td>${escapeHtml(r.bevel||'')}</td><td>${fmt(area)}</td><td>${fmt(r.qty)}</td><td>${fmt(weight)}</td><td class="money">${fmtMoney(r.price)}</td><td class="money">${fmtMoney(amount)}</td><td>${req}<button class="row-delete" title="Xóa dòng" data-index="${i}">×</button></td>`;
       body.appendChild(tr);
     });
     $('sumArea').textContent=fmt(sumArea); $('sumQty').textContent=fmt(sumQty); $('sumWeight').textContent=fmt(sumWeight); $('sumAmount').textContent=fmtMoney(sumAmount); $('paymentTotal').textContent=fmtMoney(sumAmount);
@@ -805,7 +848,8 @@
     if(g.rightHeight!==undefined) out.rightHeight=Number(g.rightHeight);
     return out;
   }
-  function rowSignature(r){
+  function rowSignature(input){
+    const r=normalizeOrderRow(input);
     const type=r.type||'normal';
     return JSON.stringify({
       type,
@@ -822,6 +866,7 @@
     });
   }
   function mergeOrAppendRow(candidate, excludeIndex=null){
+    candidate=normalizeOrderRow(candidate);
     const sig=rowSignature(candidate);
     const found=rows.findIndex((r,i)=>i!==excludeIndex && rowSignature(r)===sig);
     if(found>=0){
@@ -1205,8 +1250,42 @@
     closeSpecialDialog();
   }
 
+  function importedGlassSvg(info){
+    const shape=Array.isArray(info?.shape_contours)?info.shape_contours:[];
+    const opening=Array.isArray(info?.contours)?info.contours:[];
+    const loops=shape.length?shape:opening;
+    if(!loops.length) return '';
+    const paths=loops.map(loop=>{
+      const pts=Array.isArray(loop?.points)?loop.points:[];
+      if(pts.length<2) return '';
+      const d=pts.map((p,i)=>`${i?'L':'M'} ${(Number(p[0])*100).toFixed(3)} ${(Number(p[1])*100).toFixed(3)}`).join(' ')+' Z';
+      return `<path d="${d}"/>`;
+    }).filter(Boolean).join('');
+    if(!paths) return '';
+    return `<svg viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#fffdf8"/><g fill="#cbd5d9" fill-rule="evenodd" stroke="#4c7f89" stroke-width=".45">${paths}</g></svg>`;
+  }
+  function openImportedGlassPreview(r){
+    const g=r.glassInfo||{};
+    const outerW=Number(g.outer_width_mm||r.width||0);
+    const outerH=Number(g.outer_height_mm||r.length||0);
+    const openingW=Number(g.opening_width_mm||0);
+    const openingH=Number(g.opening_height_mm||0);
+    const svg=importedGlassSvg(g);
+    const maxW=300,maxH=300,scale=Math.min(maxW/Math.max(1,outerW),maxH/Math.max(1,outerH));
+    const dw=Math.max(100,outerW*scale),dh=Math.max(125,outerH*scale);
+    $('previewOnlyTitle').textContent='Cánh kính · SketchUp';
+    $('dimStage').innerHTML=`
+      <div class="dim-callout" style="left:10px;top:12px">Cánh: ${fmt(outerW)} × ${fmt(outerH)} mm</div>
+      <div class="dim-callout" style="left:10px;top:48px">Ô kính: ${fmt(openingW)} × ${fmt(openingH)} mm</div>
+      <div class="dim-door" style="width:${dw}px;height:${dh}px">
+        ${svg?`<img src="${createSvgData(svg)}" alt="Preview cánh kính SketchUp">`:`<div style="position:absolute;inset:0;border:2px solid #c39a45;background:#fffdf8"><div style="position:absolute;left:${Math.max(0,Number(g.left_mm||0)/Math.max(1,outerW)*100)}%;right:${Math.max(0,Number(g.right_mm||0)/Math.max(1,outerW)*100)}%;top:${Math.max(0,Number(g.top_mm||0)/Math.max(1,outerH)*100)}%;bottom:${Math.max(0,Number(g.bottom_mm||0)/Math.max(1,outerH)*100)}%;background:#cbd5d9;border:1px solid #4c7f89"></div></div>`}
+      </div>`;
+    $('previewModal').classList.add('open'); $('previewModal').setAttribute('aria-hidden','false');
+  }
+
   function openDimensionPreview(index){
     const r=rows[index]; if(!r)return;
+    if(r.type==='glass'&&r.glassInfo){ openImportedGlassPreview(r); return; }
     const type=r.type==='altar'?'altar':'glass';
     const g=normalizeSpecial(type,r.special||r.glass||{width:r.width,height:r.length,frame:0,groove:0,sample:1});
     const m=getGlassMetrics(g);
