@@ -853,6 +853,14 @@
   function sampleCount(type){ return type==='glass' ? 8 : SAMPLE_IMAGES[type].length; }
   function toNum(value,fallback){ const n=Number(value); return Number.isFinite(n) ? n : fallback; }
   function clamp(value,min,max){ return Math.min(max,Math.max(min,value)); }
+  function radiusLimitForGlass(g){
+    const glassW=Math.max(0,Number(g.width||0)-Math.max(0,Number(g.frame||0))*2);
+    const glassH=Math.max(0,Number(g.height||0)-Math.max(0,Number(g.frame||0))*2);
+    const minSide=Math.max(0,Math.min(glassW,glassH));
+    if(Number(g.sample)===8) return minSide/2;
+    if([2,5,6].includes(Number(g.sample))) return minSide;
+    return 0;
+  }
   function normalizeSpecial(type,data={}){
     const g={
       width:toNum(data.width,600),
@@ -862,7 +870,10 @@
       sample:clamp(Math.round(toNum(data.sample,1)),1,sampleCount(type))
     };
     if(type==='glass'){
-      if([2,5,6,8].includes(g.sample)) g.radius=toNum(data.radius,80);
+      if([2,5,6,8].includes(g.sample)){
+        const requestedRadius=Math.max(0,toNum(data.radius,80));
+        g.radius=clamp(requestedRadius,0,radiusLimitForGlass(g));
+      }
       if([2,5].includes(g.sample)) g.side=(data.side==='right'?'right':'left');
       if(g.sample===4){ g.leftHeight=toNum(data.leftHeight,1200); g.rightHeight=toNum(data.rightHeight,800); }
       if(g.sample===6){ g.side=(data.side==='right'?'right':'left'); g.vertical=(data.vertical==='bottom'?'bottom':'top'); }
@@ -889,19 +900,36 @@
     if(type!=='glass'){ host.innerHTML=''; return; }
     let html='';
     if(g.sample===2){
-      html=`<div class="dynamic-fields"><div><label for="glassRadius">Bán kính (mm)</label><input id="glassRadius" type="number" min="0" step="0.1" value="${fmt(g.radius)}"></div><div><label for="glassSide">Bên cong</label><select id="glassSide"><option value="left" ${g.side==='left'?'selected':''}>Trái</option><option value="right" ${g.side==='right'?'selected':''}>Phải</option></select></div><div class="full field-hint">Mẫu 2: chọn bán kính và hướng cong trái / phải.</div></div>`;
+      html=`<div class="dynamic-fields"><div><label for="glassRadius">Bán kính (mm)</label><input id="glassRadius" type="number" min="0" max="${fmt(radiusLimitForGlass(g))}" step="0.1" value="${fmt(g.radius)}"></div><div><label for="glassSide">Bên cong</label><select id="glassSide"><option value="left" ${g.side==='left'?'selected':''}>Trái</option><option value="right" ${g.side==='right'?'selected':''}>Phải</option></select></div><div class="full field-hint">Mẫu 2: R tối đa ${fmt(radiusLimitForGlass(g))} mm theo kích thước kính thực.</div></div>`;
     } else if(g.sample===4){
       html=`<div class="dynamic-fields"><div><label for="glassLeftHeight">Cao trái (mm)</label><input id="glassLeftHeight" type="number" min="0" step="0.1" value="${fmt(g.leftHeight)}"></div><div><label for="glassRightHeight">Cao phải (mm)</label><input id="glassRightHeight" type="number" min="0" step="0.1" value="${fmt(g.rightHeight)}"></div><div class="full field-hint">Mẫu 4: nhập cao trái và cao phải để tạo mặt cắt nghiêng như hình mẫu.</div></div>`;
     } else if(g.sample===5){
-      html=`<div class="dynamic-fields"><div><label for="glassRadius">Bán kính (mm)</label><input id="glassRadius" type="number" min="0" step="0.1" value="${fmt(g.radius)}"></div><div><label for="glassSide">Đầu bo</label><select id="glassSide"><option value="left" ${g.side==='left'?'selected':''}>Trái</option><option value="right" ${g.side==='right'?'selected':''}>Phải</option></select></div><div class="full field-hint">Mẫu 5: đầu bo ngang, chọn bán kính và phía trái / phải.</div></div>`;
+      html=`<div class="dynamic-fields"><div><label for="glassRadius">Bán kính (mm)</label><input id="glassRadius" type="number" min="0" max="${fmt(radiusLimitForGlass(g))}" step="0.1" value="${fmt(g.radius)}"></div><div><label for="glassSide">Đầu bo</label><select id="glassSide"><option value="left" ${g.side==='left'?'selected':''}>Trái</option><option value="right" ${g.side==='right'?'selected':''}>Phải</option></select></div><div class="full field-hint">Mẫu 5: R tối đa ${fmt(radiusLimitForGlass(g))} mm theo kích thước kính thực.</div></div>`;
     } else if(g.sample===6){
-      html=`<div class="dynamic-fields"><div><label for="glassRadius">Bán kính (mm)</label><input id="glassRadius" type="number" min="0" step="0.1" value="${fmt(g.radius)}"></div><div><label for="glassSide">Bên bo</label><select id="glassSide"><option value="left" ${g.side==='left'?'selected':''}>Trái</option><option value="right" ${g.side==='right'?'selected':''}>Phải</option></select></div><div><label for="glassVertical">Vị trí bo</label><select id="glassVertical"><option value="top" ${g.vertical==='top'?'selected':''}>Trên</option><option value="bottom" ${g.vertical==='bottom'?'selected':''}>Dưới</option></select></div><div class="full field-hint">Mẫu 6: chọn bán kính và góc bo theo trái / phải / trên / dưới.</div></div>`;
+      html=`<div class="dynamic-fields"><div><label for="glassRadius">Bán kính (mm)</label><input id="glassRadius" type="number" min="0" max="${fmt(radiusLimitForGlass(g))}" step="0.1" value="${fmt(g.radius)}"></div><div><label for="glassSide">Bên bo</label><select id="glassSide"><option value="left" ${g.side==='left'?'selected':''}>Trái</option><option value="right" ${g.side==='right'?'selected':''}>Phải</option></select></div><div><label for="glassVertical">Vị trí bo</label><select id="glassVertical"><option value="top" ${g.vertical==='top'?'selected':''}>Trên</option><option value="bottom" ${g.vertical==='bottom'?'selected':''}>Dưới</option></select></div><div class="full field-hint">Mẫu 6: R tối đa ${fmt(radiusLimitForGlass(g))} mm theo kích thước kính thực.</div></div>`;
     } else if(g.sample===8){
-      html=`<div class="dynamic-fields"><div><label for="glassRadius">Bán kính (mm)</label><input id="glassRadius" type="number" min="0" step="0.1" value="${fmt(g.radius)}"></div><div class="full field-hint">Mẫu 8: bo tròn 4 góc theo bán kính.</div></div>`;
+      html=`<div class="dynamic-fields"><div><label for="glassRadius">Bán kính (mm)</label><input id="glassRadius" type="number" min="0" max="${fmt(radiusLimitForGlass(g))}" step="0.1" value="${fmt(g.radius)}"></div><div class="full field-hint">Mẫu 8: R tối đa ${fmt(radiusLimitForGlass(g))} mm (1/2 cạnh kính nhỏ nhất).</div></div>`;
     }
     host.innerHTML=html;
-    host.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>applyPreview(readSpecialForm())));
-    host.querySelectorAll('select').forEach(el=>el.addEventListener('change',()=>applyPreview(readSpecialForm())));
+    host.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',syncSpecialPreview));
+    host.querySelectorAll('select').forEach(el=>el.addEventListener('change',syncSpecialPreview));
+  }
+  function syncSpecialPreview(){
+    const g=readSpecialForm();
+    const radiusInput=$('glassRadius');
+    if(radiusInput && [2,5,6,8].includes(Number(g.sample))){
+      const maxR=radiusLimitForGlass(g);
+      radiusInput.max=String(maxR);
+      const raw=Number(radiusInput.value);
+      if(!Number.isFinite(raw) || raw<0 || raw>maxR) radiusInput.value=fmt(g.radius);
+      const hint=radiusInput.closest('.dynamic-fields')?.querySelector('.field-hint');
+      if(hint){
+        hint.textContent=Number(g.sample)===8
+          ? `Mẫu 8: R tối đa ${fmt(maxR)} mm (1/2 cạnh kính nhỏ nhất).`
+          : `Mẫu ${g.sample}: R tối đa ${fmt(maxR)} mm theo kích thước kính thực.`;
+      }
+    }
+    applyPreview(g);
   }
   function getEffectiveOuterHeight(g){
     if(Number(g.sample)===4){
@@ -985,7 +1013,8 @@
       const x=inset, y=inset;
       const w=Math.max(2,outerW-inset*2), h=Math.max(2,outerH-inset*2);
       const radiusBase=Math.max(0,Number(g.radius||80));
-      const rr=clamp(radiusBase-inset,0,Math.min(w,h)/2);
+      const radiusMax=Number(g.sample)===8 ? Math.min(w,h)/2 : Math.min(w,h);
+      const rr=clamp(radiusBase,0,radiusMax);
       if(Number(g.sample)===4) return pointsPath(sample4OuterPoints(inset));
       if(g.sample===1) return rectPath(inset);
       if(g.sample===2){
@@ -1114,9 +1143,26 @@
     activeSpecialType=type; editingSpecialIndex=index;
     const label=typeLabel(type); $('glassTitle').textContent=index===null?label:`Chỉnh ${label}`; $('glassConfirm').textContent=index===null?'Xác nhận':'Cập nhật';
     const existing=index!==null && rows[index] ? (rows[index].special||rows[index].glass) : null;
-    const defaults=existing || getDefaultSpecial(type,1);
+    let defaults;
+    if(existing){
+      defaults=existing;
+    } else {
+      defaults=getDefaultSpecial(type,1);
+      const enteredWidth=Number($('width').value);
+      const enteredHeight=Number($('length').value);
+      if(Number.isFinite(enteredWidth) && enteredWidth>0) defaults.width=enteredWidth;
+      if(Number.isFinite(enteredHeight) && enteredHeight>0) defaults.height=enteredHeight;
+    }
+
+    // Mở dialog trước để browser có kích thước layout thật, sau đó mới dựng preview.
+    $('glassModal').classList.add('open');
+    $('glassModal').setAttribute('aria-hidden','false');
     writeSpecialForm(defaults);
-    $('glassModal').classList.add('open'); $('glassModal').setAttribute('aria-hidden','false');
+    requestAnimationFrame(()=>{
+      // Dùng đúng cùng một luồng với lúc người dùng nhập để preview ban đầu
+      // và các giới hạn bán kính luôn khớp với giá trị đang hiển thị trong form.
+      syncSpecialPreview();
+    });
   }
   function closeSpecialDialog(){ $('glassModal').classList.remove('open'); $('glassModal').setAttribute('aria-hidden','true'); editingSpecialIndex=null; }
 
@@ -1125,6 +1171,7 @@
     if(!(g.height>0)) return 'Cao phải lớn hơn 0.';
     if(g.frame<0||g.groove<0) return 'Rộng khung và Viền kính không được âm.';
     if(g.radius!==undefined && g.radius<0) return 'Bán kính không được âm.';
+    if(g.radius!==undefined && [2,5,6,8].includes(Number(g.sample)) && g.radius>radiusLimitForGlass(g)) return `Bán kính tối đa là ${fmt(radiusLimitForGlass(g))} mm.`;
     if(g.leftHeight!==undefined && g.leftHeight<0) return 'Cao trái không được âm.';
     if(g.rightHeight!==undefined && g.rightHeight<0) return 'Cao phải không được âm.';
     return '';
@@ -1201,7 +1248,7 @@
   $('glassBtn').addEventListener('click',()=>openSpecialDialog('glass'));
   $('altarBtn').addEventListener('click',()=>openSpecialDialog('altar'));
   $('glassClose').addEventListener('click',closeSpecialDialog); $('glassCancel').addEventListener('click',closeSpecialDialog); $('glassConfirm').addEventListener('click',confirmSpecial);
-  ['glassWidth','glassHeight','glassFrame','glassGroove'].forEach(id=>$(id).addEventListener('input',()=>applyPreview(readSpecialForm())));
+  ['glassWidth','glassHeight','glassFrame','glassGroove'].forEach(id=>$(id).addEventListener('input',syncSpecialPreview));
   $('glassModal').addEventListener('click',e=>{if(e.target===$('glassModal'))closeSpecialDialog();});
   $('previewOnlyClose').addEventListener('click',closeDimensionPreview);
   $('previewModal').addEventListener('click',e=>{if(e.target===$('previewModal'))closeDimensionPreview();});
