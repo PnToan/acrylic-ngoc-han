@@ -814,6 +814,12 @@
       row.type='glass';
       row.glassInfo=glass;
     }
+    const apple=row.appleInfo||row.apple_info||null;
+    if(apple&&typeof apple==='object'){
+      row.type='altar';
+      row.appleInfo=apple;
+    }
+    row.specialNote=String(row.specialNote||row.special_note||row.glassNote||row.glass_note||row.appleNote||row.apple_note||row.note||row.requirement||'');
     return row;
   }
   function normalizeAllRows(){
@@ -827,7 +833,8 @@
       const area=(Number(r.width)*Number(r.length))/1000000; const weight=area*Number(r.qty); const amount=weight*Number(r.price);
       sumArea+=area; sumQty+=Number(r.qty); sumWeight+=weight; sumAmount+=amount;
       const isSpecial=(r.type==='glass'||r.type==='altar');
-      const req=isSpecial ? `<button class="preview-icon" data-preview-index="${i}" title="Xem kích thước">${specialIcon(r.type)}</button><span>${typeLabel(r.type)}</span>` : '';
+      const reqLabel=r.specialNote||typeLabel(r.type);
+      const req=isSpecial ? `<button class="preview-icon" data-preview-index="${i}" title="Xem kích thước">${specialIcon(r.type)}</button><span>${escapeHtml(reqLabel)}</span>` : '';
       const tr=document.createElement('tr');
       tr.innerHTML=`<td>${i+1}</td><td class="left">${escapeHtml(r.name||'CÁNH')}</td><td class="left">${escapeHtml(r.color)}</td><td>${fmt(r.width)}</td><td>${fmt(r.length)}</td><td>${escapeHtml(r.bevel||'')}</td><td>${fmt(area)}</td><td>${fmt(r.qty)}</td><td>${fmt(weight)}</td><td class="money">${fmtMoney(r.price)}</td><td class="money">${fmtMoney(amount)}</td><td>${req}<button class="row-delete" title="Xóa dòng" data-index="${i}">×</button></td>`;
       body.appendChild(tr);
@@ -862,7 +869,9 @@
       priceGroup:r.priceGroup==null?null:Number(r.priceGroup),
       colorGroup:String(r.colorGroup||''),
       core:String(r.core||''),
-      special:(type==='glass'||type==='altar')?canonicalSpecial(type,r.special||r.glass):null
+      importedGlass:r.glassInfo||null,
+      importedApple:r.appleInfo||null,
+      special:(type==='glass'||type==='altar') && !r.glassInfo && !r.appleInfo ? canonicalSpecial(type,r.special||r.glass):null
     });
   }
   function mergeOrAppendRow(candidate, excludeIndex=null){
@@ -1250,19 +1259,16 @@
     closeSpecialDialog();
   }
 
-  function importedGlassSvg(info){
-    const shape=Array.isArray(info?.shape_contours)?info.shape_contours:[];
-    const opening=Array.isArray(info?.contours)?info.contours:[];
-    const loops=shape.length?shape:opening;
+  function importedSpecialSvg(info,fill='#c4874d'){
+    const loops=Array.isArray(info?.shape_contours)&&info.shape_contours.length ? info.shape_contours : (Array.isArray(info?.contours)?info.contours:[]);
     if(!loops.length) return '';
-    const paths=loops.map(loop=>{
+    const parts=loops.map(loop=>{
       const pts=Array.isArray(loop?.points)?loop.points:[];
       if(pts.length<2) return '';
-      const d=pts.map((p,i)=>`${i?'L':'M'} ${(Number(p[0])*100).toFixed(3)} ${(Number(p[1])*100).toFixed(3)}`).join(' ')+' Z';
-      return `<path d="${d}"/>`;
-    }).filter(Boolean).join('');
-    if(!paths) return '';
-    return `<svg viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#fffdf8"/><g fill="#cbd5d9" fill-rule="evenodd" stroke="#4c7f89" stroke-width=".45">${paths}</g></svg>`;
+      return pts.map((p,i)=>`${i?'L':'M'} ${(Number(p[0])*100).toFixed(3)} ${(Number(p[1])*100).toFixed(3)}`).join(' ')+' Z';
+    }).filter(Boolean);
+    if(!parts.length) return '';
+    return `<svg viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#fffdf8"/><path d="${parts.join(' ')}" fill="${fill}" fill-rule="evenodd" stroke="#6f522e" stroke-width=".45"/></svg>`;
   }
   function openImportedGlassPreview(r){
     const g=r.glassInfo||{};
@@ -1270,7 +1276,7 @@
     const outerH=Number(g.outer_height_mm||r.length||0);
     const openingW=Number(g.opening_width_mm||0);
     const openingH=Number(g.opening_height_mm||0);
-    const svg=importedGlassSvg(g);
+    const svg=importedSpecialSvg(g,'#c4874d');
     const maxW=300,maxH=300,scale=Math.min(maxW/Math.max(1,outerW),maxH/Math.max(1,outerH));
     const dw=Math.max(100,outerW*scale),dh=Math.max(125,outerH*scale);
     $('previewOnlyTitle').textContent='Cánh kính · SketchUp';
@@ -1282,10 +1288,25 @@
       </div>`;
     $('previewModal').classList.add('open'); $('previewModal').setAttribute('aria-hidden','false');
   }
+  function openImportedApplePreview(r){
+    const g=r.appleInfo||{};
+    const outerW=Number(g.outer_width_mm||r.width||0);
+    const outerH=Number(g.outer_height_mm||r.length||0);
+    const svg=importedSpecialSvg(g,'#c4874d');
+    const maxW=300,maxH=300,scale=Math.min(maxW/Math.max(1,outerW),maxH/Math.max(1,outerH));
+    const dw=Math.max(100,outerW*scale),dh=Math.max(125,outerH*scale);
+    $('previewOnlyTitle').textContent=`Ô táo · SketchUp · ${g.sample_name||('Mẫu '+(g.sample||''))}`;
+    $('dimStage').innerHTML=`
+      <div class="dim-callout" style="left:10px;top:12px">Ô táo: ${escapeHtml(g.sample_name||('Mẫu '+(g.sample||'')))}</div>
+      <div class="dim-callout" style="left:10px;top:48px">Kích thước: ${fmt(outerW)} × ${fmt(outerH)} mm</div>
+      <div class="dim-door" style="width:${dw}px;height:${dh}px">${svg?`<img src="${createSvgData(svg)}" alt="Preview ô táo SketchUp">`:''}</div>`;
+    $('previewModal').classList.add('open'); $('previewModal').setAttribute('aria-hidden','false');
+  }
 
   function openDimensionPreview(index){
     const r=rows[index]; if(!r)return;
     if(r.type==='glass'&&r.glassInfo){ openImportedGlassPreview(r); return; }
+    if(r.type==='altar'&&r.appleInfo){ openImportedApplePreview(r); return; }
     const type=r.type==='altar'?'altar':'glass';
     const g=normalizeSpecial(type,r.special||r.glass||{width:r.width,height:r.length,frame:0,groove:0,sample:1});
     const m=getGlassMetrics(g);
