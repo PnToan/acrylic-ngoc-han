@@ -1,2 +1,2 @@
-version=0.0.31
+version=0.0.40
 rbz_url=https://raw.githubusercontent.com/PnToan/acrylic-ngoc-han/main/ac_ngochan.rbz
